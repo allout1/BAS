@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styleindex.css' %}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="nav">
+        <ul>
+            <li><a href="about">About us</a></li>
+            <li><a href="contact">Contact us</a></li>
+            <li><a href="helpline">Help</a> </li>
+            <li class="lib_blog"><a href="https://ndl.iitkgp.ac.in/">National e-Library</a></li>
+            <li class="lib_blog"><a href="https://alittleblogofbooks.com/">Blogs</a></li>
+        </ul>
+    </div>
+    <div class="ticker-container">
+        <div class="ticker-wrapper">
+        <div class="ticker-transition">
+        <div class="ticker-item">BookShop welcomes you</div>
+        <div class="ticker-item">Login as Manager</div>
+        <div class="ticker-item">Login as User</div>
+        <div class="ticker-item">Login as Employee</div>
+        </div>
+        </div>
+    </div>
+   <div class="main">
+        
+        <h1>Welcome to Book Shop</h1>
+        <button type="button" class="customer" onclick="window.location.href='{% url 'customer' %}'">
+            Customer
+        </button>
+        <a href="admin">
+            <button type="button" class="manager" >
+            Manager
+            </button>
+        </a>
+        
+        <button type ="button" class="employee">
+            Employee
+        </button>
+        
+        
+    </div>   
+    
+    
+</body>
+</html>
