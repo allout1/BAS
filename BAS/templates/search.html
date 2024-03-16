@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container">
+    <h2>Search Books</h2>
+    <form method="GET" action="{% url 'search' %}">
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Search by title or author" name="query" value="{{ request.GET.query }}">
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="submit">Search</button>
+            </div>
+        </div>
+    </form>
+
+    {% if books %}
+        <div class="row">
+            {% for book in books %}
+                <div class="col-3">
+                    <div class="card mb-4" style="width: 250px;height: 500px;margin: 0 auto;overflow: hidden;">
+                        <img class="card-img-top px-3" src="{{ book.image.url }}" alt="{{ book.title }}" height="270" width="80">
+                        <div class="card-body" style="font-size: 0.8em;">
+                            <h5 class="card-title">{{ book.title }}</h5>
+                            <p class="card-text">Author: {{ book.author }}</p>
+                            <p class="card-text">Price: {{ book.price }}</p>
+                            <form method="POST" action="{% url 'add_to_cart' book.id %}">
+                                {% csrf_token %}
+                                <div class="input-group mb-3">
+                                    <input type="number" class="form-control" placeholder="Quantity" name="quantity" min="1" max="{{ book.inventory.stock }}">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary" type="submit">Add to Cart</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No books found.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

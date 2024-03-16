@@ -36,6 +36,9 @@ class Cart(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     quantity = models.IntegerField()
 
+    def __str__(self):
+        return f"{self.book.title}-{self.quantity}"
+
 class Inventory(models.Model):
     book = models.OneToOneField(Book, on_delete=models.CASCADE)
     stock = models.IntegerField()

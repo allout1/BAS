@@ -2,50 +2,58 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" type="text/css" href="{% static 'css/styleindex.css' %}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Bookstore</title>
+    <!-- Add Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Add custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/styleindex.css' %}">
 </head>
 <body>
-    <div class="nav">
-        <ul>
-            <li><a href="about">About us</a></li>
-            <li><a href="contact">Contact us</a></li>
-            <li><a href="helpline">Help</a> </li>
-            <li class="lib_blog"><a href="https://ndl.iitkgp.ac.in/">National e-Library</a></li>
-            <li class="lib_blog"><a href="https://alittleblogofbooks.com/">Blogs</a></li>
-        </ul>
-    </div>
-    <div class="ticker-container">
-        <div class="ticker-wrapper">
-        <div class="ticker-transition">
-        <div class="ticker-item">BookShop welcomes you</div>
-        <div class="ticker-item">Login as Manager</div>
-        <div class="ticker-item">Login as User</div>
-        <div class="ticker-item">Login as Employee</div>
+    <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel" data-interval="3000" style="margin: 0;">
+        <ol class="carousel-indicators">
+            <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
+            <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
+            <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
+        </ol>
+        <div class="carousel-inner" style="height: 100vh;">
+            <div class="carousel-item active" style="height: 100%;">
+                <img src="{% static 'images/bookstore3.jpg' %}" class="d-block w-100" alt="..." style="height: 100%; object-fit: cover;">
+            </div>
+            <div class="carousel-item" style="height: 100%;">
+                <img src="{% static 'images/bookstore4.jpg' %}" class="d-block w-100" alt="..." style="height: 100%; object-fit: cover;">
+            </div>
+            <div class="carousel-item" style="height: 100%;">
+                <img src="{% static 'images/bookstore1.jpg' %}" class="d-block w-100" alt="..." style="height: 100%; object-fit: cover;">
+            </div>
         </div>
-        </div>
-    </div>
-   <div class="main">
-        
-        <h1>Welcome to Book Shop</h1>
-        <button type="button" class="customer" onclick="window.location.href='{% url 'customer' %}'">
-            Customer
-        </button>
-        <a href="admin">
-            <button type="button" class="manager" >
-            Manager
-            </button>
+        <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
         </a>
-        
-        <button type ="button" class="employee">
-            Employee
-        </button>
-        
-        
-    </div>   
-    
-    
+        <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+        </a>
+        <div class="container-fluid" style="position: absolute; top: 10%; background-color: rgba(0, 0, 0, 0.5);">
+            <div class="row">
+                <div class="col-12">
+                    <h1 class="text-center mt-5" style="color:white">Welcome to Bookstore</h1>
+                    <div class="text-center mb-5">
+                        <!-- Add three buttons -->
+                        <a href='search' class="btn btn-primary mr-3">Customer</a>
+                        <a href='admin' class="btn btn-primary mr-3">Manager</a>
+                        <a href='employee' class="btn btn-primary">Employee</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Add Bootstrap and custom JavaScript -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="{% static 'js/scripts.js' %}"></script>
 </body>
 </html>
