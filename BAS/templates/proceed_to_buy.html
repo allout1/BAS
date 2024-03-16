@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Proceed to Buy</title>
+</head>
+<body>
+    <h1>Proceed to Buy</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Generate Bill</button>
+    </form>
+</body>
+</html>

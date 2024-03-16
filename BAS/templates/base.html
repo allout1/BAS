@@ -12,7 +12,7 @@
   </head>
   <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <a class="navbar-brand" href="#">Bookstore</a>
+    <a class="navbar-brand" href={% url 'search' %}>Bookstore</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -24,6 +24,15 @@
             <li class="nav-item active">
                 <a class="nav-link" href={% url 'cart' %}>Cart <span class="sr-only">(current)</span></a>
             </li>
+            <li class="nav-item active">
+                <a class="nav-link" href={% url 'procure' %}>Request<span class="sr-only">(current)</span></a>
+            </li>
+            <li>
+                <form action="{% url 'clear_cart' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-light custom-button" style="margin-left:800px;">Start Shopping</button>
+                </form>
+            </li>
             <!-- Add other links here -->
         </ul>
     </div>
@@ -32,7 +41,6 @@
         {% if messages %}
             <div class="alert alert-dismissible alert-success">
                 <button type="button" class="close" data-dismiss="alert">&times;</button>
-                <strong>Success:</strong>
                 <ul>
                     {% for message in messages %}
                         <li>{{ message }}</li>

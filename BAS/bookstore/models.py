@@ -8,6 +8,7 @@ class Book(models.Model):
     price= models.DecimalField(max_digits=8, decimal_places=2)
     isbn= models.CharField(max_length=13,unique=True)
     image= models.ImageField(upload_to='static/images')
+    genre= models.CharField(max_length=50,default="")
 
     def __str__(self):
         return self.title
@@ -49,9 +50,12 @@ class Inventory(models.Model):
 
 class Sales(models.Model):
     date= models.DateTimeField()
-    book = models.OneToOneField(Book, on_delete=models.CASCADE)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
     revenue= models.DecimalField(max_digits=10,decimal_places=2)
+    quantity=models.IntegerField(default=0)
 
     def __str__(self):
         return f"{self.date} - {self.book.title}"
+
+
 

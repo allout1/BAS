@@ -19,10 +19,10 @@
                 <div class="col-3">
                     <div class="card mb-4" style="width: 250px;height: 500px;margin: 0 auto;overflow: hidden;">
                         <img class="card-img-top px-3" src="{{ book.image.url }}" alt="{{ book.title }}" height="270" width="80">
-                        <div class="card-body" style="font-size: 0.8em;">
+                        <div class="card-body" style="font-size: 0.9em;">
                             <h5 class="card-title">{{ book.title }}</h5>
                             <p class="card-text">Author: {{ book.author }}</p>
-                            <p class="card-text">Price: {{ book.price }}</p>
+                            <p class="card-text">Price: ₹ {{ book.price }}</p>
                             <form method="POST" action="{% url 'add_to_cart' book.id %}">
                                 {% csrf_token %}
                                 <div class="input-group mb-3">
