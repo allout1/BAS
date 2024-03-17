@@ -29,9 +29,10 @@ class ProcureBook(models.Model):
     author_name= models.CharField(max_length=50)
     book_publisher= models.CharField(max_length=50)
     book_isbn= models.CharField(max_length=13,default="")
+    genre= models.CharField(max_length=50,default="")
 
     def __str__(self):
-        return f"{self.book_title}-{self.username}"
+        return f"{self.book_title}-{self.user_name}"
 
 class Cart(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
