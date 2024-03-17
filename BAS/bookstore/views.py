@@ -14,14 +14,17 @@ def index(request):
 #---SEARCH-BOOKS---#
 def search(request):
     query = request.GET.get('query') # get query from the form
+    all_books= Book.objects.all()
     if query: # search for the book either by author name or title in the books table of db
         books = Book.objects.filter(
             Q(title__icontains=query) | Q(author__icontains=query)
         )
+        normal=0
     else:
         books = []
+        normal=1
     # render the page search.html  with the list of searched book
-    return render(request, 'search.html', {'books': books, 'request': request})
+    return render(request, 'search.html', {'books': books, 'request': request, 'genres':['fiction','self-help'], 'all_books':all_books,'normal':normal})
 
 #---ADD-A-BOOK-TO-CART---#
 def add_to_cart(request, book_id):
