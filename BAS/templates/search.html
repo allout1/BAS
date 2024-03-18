@@ -1,19 +1,25 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load custom_filters %}
+
 {% block title %}
 Bookstore
 {% endblock %}
+
 {% block content %}
 
 <div class="container">
-    <h2>Search Books</h2>
-    {% comment %} form for searching a book by author or title  {% endcomment %}
+    <h2 class="mb-4 text-center">Search Books</h2>
+    <!-- form for searching a book by author or title -->
     <form method="GET" action="{% url 'search' %}">
+        <div>
+            <label><input type="radio" name="search_type" value="author" checked> Search by Author </label>
+            <label><input type="radio" name="search_type" value="title" class="ml-5"> Search by Title</label>
+        </div>
         <div class="input-group mb-3">
             <input type="text" class="form-control" placeholder="Search by title or author" name="query" value="{{ request.GET.query }}">
             <div class="input-group-append">
-                <button class="btn btn-outline-secondary" type="submit">Search</button>
+                <button class="btn btn-outline-secondary btn-sm" type="submit">Search</button>
             </div>
         </div>
     </form>
@@ -21,7 +27,7 @@ Bookstore
     {% if normal == 1 %}
         {% for genre in genres %}
         <div class="container mx-0">
-            <h3>{{ genre }}</h3>
+            <h3 style="text-transform: capitalize;">{{ genre }}</h3>
             <div id="slider_{{ forloop.counter }}" class="carousel slide px-5" data-ride="carousel">
                 <div class="carousel-inner">
                     {% for book in all_books|books_by_genre:genre %}
@@ -29,19 +35,22 @@ Bookstore
                             <div class="carousel-item active">
                                 <div class="row">
                         {% endif %}
-                        <div class="col-3">
-                            <div class="card mb-4" style="width: 250px;height: 500px;margin: 0 auto;overflow: hidden;">
-                                <img class="card-img-top px-3" src="{{ book.image.url }}" alt="{{ book.title }}" height="270" width="80">
-                                <div class="card-body" style="font-size: 0.9em;">
-                                    <h5 class="card-title">{{ book.title }}</h5>
-                                    <p class="card-text">Author: {{ book.author }}</p>
+                        <div class="col-lg-3 col-md-4 col-sm-6">
+                            <div class="card mb-4">
+                                <div class="image-container p-3" style="height: 250px; overflow: hidden;">
+                                    <img class="card-img-top" src="{{ book.image.url }}" alt="{{ book.title }}" style="width: 100%; height: 250px;">
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title" style="white-space: normal; height: 50px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">{{ book.title }}</h5>
+                                    <p class="card-text" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0;">Author: {{ book.author }}</p>
                                     <p class="card-text">Price: ₹ {{ book.price }}</p>
+                                    <p class="card-text">Stock: {{ book.inventory.stock }}</p>
                                     <form method="POST" action="{% url 'add_to_cart' book.id %}">
                                         {% csrf_token %}
                                         <div class="input-group mb-3">
-                                            <input type="number" class="form-control" placeholder="Quantity" name="quantity" min="1" max="{{ book.inventory.stock }}">
+                                            <input type="number" class="form-control form-control-sm" placeholder="Quantity" name="quantity" min="1" max="{{ book.inventory.stock }}">
                                             <div class="input-group-append">
-                                                <button class="btn btn-primary" type="submit">Add to Cart</button>
+                                                <button class="btn btn-primary btn-sm" type="submit">Add to Cart</button>
                                             </div>
                                         </div>
                                     </form>
@@ -58,37 +67,36 @@ Bookstore
                     </div>
                     </div>
                 </div>
-                {% if not forloop.last %}
-                    <a class="carousel-control-prev" href="#slider_{{ forloop.counter }}" role="button" data-slide="prev" style="margin-left:-20px; max-width:50px ">
-                        <img src="{% static 'icon/arrow-left-circle.svg' %}" alt="Previous" style="width: 50px; height: 50px;">
-                    </a>
-                    <a class="carousel-control-next" href="#slider_{{ forloop.counter }}" role="button" data-slide="next" style="margin-right:-20px; max-width:50px ">
-                        <img src="{% static 'icon/arrow-right-circle.svg' %}" alt="Next" style="width: 50px; height: 50px;">
-                    </a>
-                {% endif %}
+
+                <a class="carousel-control-prev" href="#slider_{{ forloop.counter }}" role="button" data-slide="prev" style="left: -65px;">
+                    <img src="{% static 'icon/arrow-left-circle.svg' %}" alt="Previous" style="width: 50px; height: 50px;">
+                </a>
+                <a class="carousel-control-next" href="#slider_{{ forloop.counter }}" role="button" data-slide="next" style="right: -65px;">
+                    <img src="{% static 'icon/arrow-right-circle.svg' %}" alt="Next" style="width: 50px; height: 50px;">
+                </a>
             </div>
         </div>
         {% endfor %}
-    
-
-
-    {% comment %} if books is not null i.e. searched books are sent  {% endcomment %}
     {% elif books %}
+        <h3 class="mb-4 text-center">Search Result</h3>
         <div class="row">
             {% for book in books %}
-                <div class="col-3">
-                    <div class="card mb-4" style="width: 250px;height: 500px;margin: 0 auto;overflow: hidden;">
-                        <img class="card-img-top px-3" src="{{ book.image.url }}" alt="{{ book.title }}" height="270" width="80">
-                        <div class="card-body" style="font-size: 0.9em;">
-                            <h5 class="card-title">{{ book.title }}</h5>
-                            <p class="card-text">Author: {{ book.author }}</p>
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="card mb-4">
+                        <div class="image-container p-3" style="height: 300px; overflow: hidden;">
+                                <img class="card-img-top" src="{{ book.image.url }}" alt="{{ book.title }}" style="width: 100%; height: auto;">
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title" style="white-space: normal; height: 50px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">{{ book.title }}</h5>
+                            <p class="card-text" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0;">Author: {{ book.author }}</p>
                             <p class="card-text">Price: ₹ {{ book.price }}</p>
+                            <p class="card-text">Stock: {{ book.inventory.stock }}</p>
                             <form method="POST" action="{% url 'add_to_cart' book.id %}">
                                 {% csrf_token %}
                                 <div class="input-group mb-3">
-                                    <input type="number" class="form-control" placeholder="Quantity" name="quantity" min="1" max="{{ book.inventory.stock }}">
+                                    <input type="number" class="form-control form-control-sm" placeholder="Quantity" name="quantity" min="1" max="{{ book.inventory.stock }}">
                                     <div class="input-group-append">
-                                        <button class="btn btn-primary" type="submit">Add to Cart</button>
+                                        <button class="btn btn-primary btn-sm" type="submit">Add to Cart</button>
                                     </div>
                                 </div>
                             </form>
@@ -97,7 +105,6 @@ Bookstore
                 </div>
             {% endfor %}
         </div>
-    {% comment %} else print no books found  {% endcomment %}
     {% else %}
         <p>No books found.</p>
     {% endif %}

@@ -1,17 +1,27 @@
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 # Create your models here.
 class Book(models.Model):
-    title= models.CharField(max_length=50)
+    title= models.CharField(max_length=100)
     author= models.CharField(max_length=50)
     publisher= models.CharField(max_length=50)
     price= models.DecimalField(max_digits=8, decimal_places=2)
     isbn= models.CharField(max_length=13,unique=True)
-    image= models.ImageField(upload_to='static/images')
+    image= models.ImageField(upload_to='static/images',default='static/images/book.png')
     genre= models.CharField(max_length=50,default="")
 
     def __str__(self):
         return self.title
+
+@receiver(post_save, sender=Book)
+def create_inventory(sender, instance, created, **kwargs):
+    """
+    Create an Inventory record when a new Book instance is created.
+    """
+    if created:
+        Inventory.objects.create(book=instance, stock=0)
 
 class RequestBook(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
@@ -43,7 +53,7 @@ class Cart(models.Model):
 
 class Inventory(models.Model):
     book = models.OneToOneField(Book, on_delete=models.CASCADE)
-    stock = models.IntegerField()
+    stock = models.IntegerField(default=0)
     rack_number = models.CharField(max_length=1)
 
     def __str__(self):
