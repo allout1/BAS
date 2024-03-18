@@ -4,6 +4,8 @@ from bookstore import views
 from django.db.models import Q
 from django.utils import timezone
 from .models import Book,Cart,Inventory, Sales, ProcureBook
+from django.core.mail import send_mail
+from django.conf import settings
 
 # Create your views here.
 
@@ -30,6 +32,9 @@ def search(request):
         normal=1
     # render the page search.html  with the list of searched book
     return render(request, 'search.html', {'books': books, 'request': request, 'genres':['fiction','self-help','JEE'], 'all_books':all_books,'normal':normal})
+
+# def prev_search_page(request):
+#     return redirect(request.META.get('HTTP_REFERER', 'search'))
 
 #---ADD-A-BOOK-TO-CART---#
 def add_to_cart(request, book_id):
@@ -138,11 +143,22 @@ def proceed_to_buy(request):
         total_price = sum(cart_item.book.price * cart_item.quantity for cart_item in cart_items)
         # fill the bill content
         bill_content = f"Buyer Name: {name}<br>Email: {email}<br>Phone Number: {phone}<br><br>Items:<br>"
+        bill_email="\n"
+
         for cart_item in cart_items:
             bill_content += f"{cart_item.book.title} - {cart_item.quantity} - {cart_item.book.price * cart_item.quantity}<br>"
+            bill_email+=f"{cart_item.book.title} X {cart_item.quantity} - ₹{cart_item.book.price * cart_item.quantity}\n"  #inside loop
             sales= Sales.objects.create(date=timezone.now(),book=cart_item.book,quantity=cart_item.quantity,revenue=cart_item.book.price * cart_item.quantity)
             sales.save()
         bill_content += f"<br>Total: ${total_price}"
+        bill_email+=f"\nTotal: ₹{total_price}"# just outside loop
+
+        #email sending procedure
+        subject = 'Bill for your purchase'
+        message = f'Hi {name}, thank you for buying.\nYour purchase is:\n{bill_email}\n\n Visit us Again'
+        email_from = settings.EMAIL_HOST_USER
+        recipient_list = [email, ]
+        send_mail( subject, message, email_from, recipient_list )
 
         # delete the cart
         Cart.objects.all().delete()
