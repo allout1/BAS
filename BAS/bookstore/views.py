@@ -13,7 +13,6 @@ import re
 #---HOME-PAGE---#
 def index(request):
     return render(request,'index.html') # return the home page
-
 #---SEARCH-BOOKS---#
 def search(request):
     query = request.GET.get('query') # get query from the form
@@ -85,8 +84,31 @@ def search_authors(request):
     # render the page search.html  with the list of searched book
     return books
 
-# def prev_search_page(request):
-#     return redirect(request.META.get('HTTP_REFERER', 'search'))
+#---SEARCH-AUTHORS---#
+def search_authors(request):
+    query = str(request.GET.get('query')) # get query from the form
+    query = query.replace('.',' ')
+    query = query.lower()
+    query = query.split(' ')
+    if query: # search for the book either by author name or title in the books table of db
+        books = {str(book[0]) for book in Book.objects.values_list('author')}
+    else:
+        books = {}
+    y = "[.*,-:() ]*"
+    result = list()
+    for i in query:
+        y += (i+  "[.*,-:() ]*")
+    for i in books:
+        if(re.search(y,i.lower())):
+            result.append(i)
+    books = Book.objects.none()
+    for i in result:
+        r = Book.objects.filter(
+            Q(author=i)
+        )
+        books = books.union(r)
+    # render the page search.html  with the list of searched book
+    return books
 
 #---ADD-A-BOOK-TO-CART---#
 def add_to_cart(request, book_id):
@@ -106,9 +128,12 @@ def add_to_cart(request, book_id):
     
     if created:
         cart.quantity = quantity
+        book.quantity -= quantity
     else:
         cart.quantity += quantity
+        book.quantity -= quantity
     cart.save() # save the book with quantity in the Cart
+    book.save()
     # give a success message that the book is added to the cart and redirect to the previous page
     messages.success(request, f"{book.title} added to cart.")
     return redirect(request.META.get('HTTP_REFERER', 'search'))
@@ -116,6 +141,7 @@ def add_to_cart(request, book_id):
 #---CART-PAGE---#
 def cart(request):
     cart = Cart.objects.all()
+    print(cart)
     total_price=0
     for cart_item in cart: # find the total price of the cart
         total_price+=cart_item.book.price * cart_item.quantity
@@ -195,22 +221,11 @@ def proceed_to_buy(request):
         total_price = sum(cart_item.book.price * cart_item.quantity for cart_item in cart_items)
         # fill the bill content
         bill_content = f"Buyer Name: {name}<br>Email: {email}<br>Phone Number: {phone}<br><br>Items:<br>"
-        bill_email="\n"
-
         for cart_item in cart_items:
             bill_content += f"{cart_item.book.title} - {cart_item.quantity} - {cart_item.book.price * cart_item.quantity}<br>"
-            bill_email+=f"{cart_item.book.title} X {cart_item.quantity} - ₹{cart_item.book.price * cart_item.quantity}\n"  #inside loop
             sales= Sales.objects.create(date=timezone.now(),book=cart_item.book,quantity=cart_item.quantity,revenue=cart_item.book.price * cart_item.quantity)
             sales.save()
         bill_content += f"<br>Total: ${total_price}"
-        bill_email+=f"\nTotal: ₹{total_price}"# just outside loop
-
-        #email sending procedure
-        subject = 'Bill for your purchase'
-        message = f'Hi {name}, thank you for buying.\nYour purchase is:\n{bill_email}\n\n Visit us Again'
-        email_from = settings.EMAIL_HOST_USER
-        recipient_list = [email, ]
-        send_mail( subject, message, email_from, recipient_list )
 
         # delete the cart
         Cart.objects.all().delete()
@@ -219,3 +234,22 @@ def proceed_to_buy(request):
         return HttpResponse(bill_content)
     else:
         return HttpResponse("Invalid request method.")
+#---THRESHOLD--CALCULATION---#   
+def threshold(request):
+    today = datetime.date.today()
+    two_weeks_ago = today-datetime.timedelta(days = 14)
+    books = Sales.objects.filter(date__gte= two_weeks_ago,date__lte = today)
+    sales = dict()
+    for i in books:
+        sales[i.book.isbn] = 0
+    for i in books:
+        sales[i.book.isbn] += i.quantity
+    threshold = dict()
+    for i in sales:
+        proc_time = 20
+        threshold[Book.objects.filter(Q(isbn = i))] = sales[i] + proc_time
+    return render(request, 'threshold.html', {'threshold': threshold})
+    
+
+
+
