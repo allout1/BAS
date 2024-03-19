@@ -6,6 +6,7 @@ from django.utils import timezone
 from .models import Book,Cart,Inventory, Sales, ProcureBook
 from django.core.mail import send_mail
 from django.conf import settings
+import re
 
 # Create your views here.
 
@@ -21,9 +22,9 @@ def search(request):
 
     if query and search_type: # search for the book either by author name or title in the books table of db
         if search_type == 'author':
-            books = Book.objects.filter(author__icontains=query)
+            books = search_authors(request)
         elif search_type == 'title':
-            books = Book.objects.filter(title__icontains=query)
+            books = search_books(request)
         else:
             books = []
         normal = 0
@@ -32,6 +33,57 @@ def search(request):
         normal=1
     # render the page search.html  with the list of searched book
     return render(request, 'search.html', {'books': books, 'request': request, 'genres':['fiction','self-help','JEE'], 'all_books':all_books,'normal':normal})
+#---SEARCH-TITLE---#
+def search_books(request):
+    print(Book.objects.all())
+    query = str(request.GET.get('query')) # get query from the form
+    query = query.replace(' ','')
+    query = query.lower()
+    if query: # search for the book either by author name or title in the books table of db
+        books = {str(book[0]) for book in Book.objects.values_list('title')}
+    else: 
+        books = {}
+    y = "[.*,-:()' ]*"
+    result = list()
+    for i in query:
+        y += (i+  "[.*,-:()' ]*")
+    for i in books:
+        if(re.search(y,i.lower())):
+            result.append(i)
+    books = Book.objects.none()
+    for i in result:
+        r = Book.objects.filter(
+            Q(title=i)
+        )
+        books = books.union(r)
+    # render the page search.html  with the list of searched book
+    return books
+
+#---SEARCH-AUTHORS---#
+def search_authors(request):
+    query = str(request.GET.get('query')) # get query from the form
+    query = query.replace('.',' ')
+    query = query.replace(' ','')
+    query = query.lower()
+    if query: # search for the book either by author name or title in the books table of db
+        books = {str(book[0]) for book in Book.objects.values_list('author')}
+    else:
+        books = {}
+    y = "[.*,-:()' ]*"
+    result = list()
+    for i in query:
+        y += (i+  "[.*,-:()' ]*")
+    for i in books:
+        if(re.search(y,i.lower())):
+            result.append(i)
+    books = Book.objects.none()
+    for i in result:
+        r = Book.objects.filter(
+            Q(author=i)
+        )
+        books = books.union(r)
+    # render the page search.html  with the list of searched book
+    return books
 
 # def prev_search_page(request):
 #     return redirect(request.META.get('HTTP_REFERER', 'search'))

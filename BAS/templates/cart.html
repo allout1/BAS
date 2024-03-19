@@ -15,6 +15,7 @@ Cart
                     <th>Title</th>
                     <th>Author</th>
                     <th>Price</th>
+                    <th>Rack_number</th>
                     <th>Quantity</th>
                     <th>Remove</th>
                 </tr>
@@ -25,6 +26,7 @@ Cart
                         <td>{{ item.book.title }}</td>
                         <td>{{ item.book.author }}</td>
                         <td>{{ item.book.price }}</td>
+                        <td>{{ item.book.inventory.rack_number}}</td>
                         <td>{{ item.quantity }}</td>
                         <td>
                             <form method="post" action="{% url 'remove_from_cart' item.id %}">

@@ -11,6 +11,7 @@ class Book(models.Model):
     isbn= models.CharField(max_length=13,unique=True)
     image= models.ImageField(upload_to='static/images',default='static/images/book.png')
     genre= models.CharField(max_length=50,default="")
+    desc= models.CharField(max_length=200,default="")
 
     def __str__(self):
         return self.title
@@ -67,6 +68,19 @@ class Sales(models.Model):
 
     def __str__(self):
         return f"{self.date} - {self.book.title}"
+
+class Vendor(models.Model):
+    name= models.CharField(max_length=100)
+    email= models.EmailField()
+    phone= models.IntegerField()
+    address= models.CharField(max_length=200)
+
+class Vendor_list(models.Model):
+    book = models.OneToOneField(Book, on_delete=models.CASCADE)
+    vendor= models.ForeignKey(Vendor,on_delete=models.CASCADE)
+    threshold= models.IntegerField()
+    
+
 
 
 
