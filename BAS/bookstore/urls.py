@@ -13,6 +13,8 @@ urlpatterns = [
     path("remove_from_cart/<int:book_id>/", views.remove_from_cart, name="remove_from_cart"),
     path('clear-cart/', views.clear_cart, name='clear_cart'),
     path('procure/',views.procure,name='procure'),
+    path('request_book/<int:book_id>/',views.request_book,name='request_book'),
     path('proceed_to_buy/', views.proceed_to_buy, name='proceed_to_buy'),
     path('send-procure-request/', views.send_procure_request, name='send_procure_request'),
+    path('book_details/<int:book_id>/', views.book_details, name='book_details'),
 ]

@@ -3,7 +3,7 @@ from django.contrib import messages
 from bookstore import views
 from django.db.models import Q
 from django.utils import timezone
-from .models import Book,Cart,Inventory, Sales, ProcureBook
+from .models import Book,Cart,Inventory, Sales, ProcureBook, RequestBook
 from django.core.mail import send_mail
 from django.conf import settings
 import re
@@ -72,32 +72,6 @@ def search_authors(request):
     result = list()
     for i in query:
         y += (i+  "[.*,-:()' ]*")
-    for i in books:
-        if(re.search(y,i.lower())):
-            result.append(i)
-    books = Book.objects.none()
-    for i in result:
-        r = Book.objects.filter(
-            Q(author=i)
-        )
-        books = books.union(r)
-    # render the page search.html  with the list of searched book
-    return books
-
-#---SEARCH-AUTHORS---#
-def search_authors(request):
-    query = str(request.GET.get('query')) # get query from the form
-    query = query.replace('.',' ')
-    query = query.lower()
-    query = query.split(' ')
-    if query: # search for the book either by author name or title in the books table of db
-        books = {str(book[0]) for book in Book.objects.values_list('author')}
-    else:
-        books = {}
-    y = "[.*,-:() ]*"
-    result = list()
-    for i in query:
-        y += (i+  "[.*,-:() ]*")
     for i in books:
         if(re.search(y,i.lower())):
             result.append(i)
@@ -234,6 +208,7 @@ def proceed_to_buy(request):
         return HttpResponse(bill_content)
     else:
         return HttpResponse("Invalid request method.")
+
 #---THRESHOLD--CALCULATION---#   
 def threshold(request):
     today = datetime.date.today()
@@ -250,6 +225,35 @@ def threshold(request):
         threshold[Book.objects.filter(Q(isbn = i))] = sales[i] + proc_time
     return render(request, 'threshold.html', {'threshold': threshold})
     
+
+def book_details(request,book_id):
+    book = get_object_or_404(Book, id=book_id)
+    return render(request, 'book_details.html',{'book':book})
+
+
+def request_book(request, book_id):
+    book = get_object_or_404(Book, pk=book_id)
+
+    if request.method == 'POST':
+        requested_by = request.POST.get('name')
+        email = request.POST.get('email')
+        quantity = int(request.POST.get('quantity'))
+
+        if quantity <= 0:
+            return render(request, 'your_template.html', {'error_message': 'Invalid quantity. Please enter a positive number.'})
+
+        if quantity <= book.inventory.stock:
+            # If the requested quantity is available in stock, handle as a regular purchase
+            # You may want to add your purchase logic here
+            pass
+        else:
+            # If the requested quantity exceeds the stock, create a request
+            RequestBook.objects.create(date_of_request=timezone.now(),book=book, requested_by=requested_by, email=email, quantity=quantity).save()
+        
+    # Redirect back to the book detail page
+    return redirect(request.META.get('HTTP_REFERER', 'book_details'))
+
+
 
 
 

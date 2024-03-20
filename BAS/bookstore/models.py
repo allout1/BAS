@@ -11,7 +11,7 @@ class Book(models.Model):
     isbn= models.CharField(max_length=13,unique=True)
     image= models.ImageField(upload_to='static/images',default='static/images/book.png')
     genre= models.CharField(max_length=50,default="")
-    desc= models.CharField(max_length=200,default="")
+    desc= models.CharField(max_length=1000,default="")
 
     def __str__(self):
         return self.title
@@ -27,7 +27,9 @@ def create_inventory(sender, instance, created, **kwargs):
 class RequestBook(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     requested_by = models.CharField(max_length=50)
-    date_of_request= models.DateTimeField(auto_now_add=True)
+    email= models.EmailField(default="")
+    quantity= models.IntegerField(default=0)
+    date_of_request= models.DateTimeField()
 
     def __str__(self):
         return f"{self.book.title}-{self.requested_by}"
