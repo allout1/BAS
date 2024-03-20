@@ -13,7 +13,7 @@ Bookstore
     <!-- form for searching a book by author or title -->
     <form method="GET" action="{% url 'search' %}">
         <div>
-            <label><input type="radio" name="search_type" value="author" checked> Search by Author </label>
+            <label><input type="radio" name="search_type" value="author"> Search by Author </label>
             <label><input type="radio" name="search_type" value="title" class="ml-5"> Search by Title</label>
         </div>
         <div class="input-group mb-3">
