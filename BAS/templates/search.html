@@ -26,7 +26,7 @@ Bookstore
 
     {% if normal == 1 %}
         {% for genre in genres %}
-        <div class="container mx-0">
+        <div class="container mx-0 text-center">
             <h3 style="text-transform: capitalize;">{{ genre }}</h3>
             <div id="slider_{{ forloop.counter }}" class="carousel slide px-5" data-ride="carousel">
                 <div class="carousel-inner">
@@ -74,6 +74,7 @@ Bookstore
                     <img src="{% static 'icon/arrow-right-circle.svg' %}" alt="Next" style="width: 50px; height: 50px;">
                 </a>
             </div>
+            <hr style="border: 1px solid black;">
         </div>
         {% endfor %}
     {% elif books %}
