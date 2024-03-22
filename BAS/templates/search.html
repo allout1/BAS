@@ -13,11 +13,11 @@ Bookstore
     <!-- form for searching a book by author or title -->
     <form method="GET" action="{% url 'search' %}">
         <div>
-            <label><input type="radio" name="search_type" value="author"> Search by Author </label>
-            <label><input type="radio" name="search_type" value="title" class="ml-5"> Search by Title</label>
+            <label><input type="radio" name="search_type" value="author" required> Search by Author </label>
+            <label><input type="radio" name="search_type" value="title" class="ml-5" required> Search by Title</label>
         </div>
         <div class="input-group mb-3">
-            <input type="text" class="form-control" placeholder="Search by title or author" name="query" value="{{ request.GET.query }}">
+            <input type="text" class="form-control" placeholder="Search by title or author" name="query" value="{{ request.GET.query }}" required>
             <div class="input-group-append">
                 <button class="btn btn-outline-secondary btn-sm" type="submit">Search</button>
             </div>
@@ -30,27 +30,28 @@ Bookstore
             <h3 style="text-transform: capitalize;">{{ genre }}</h3>
             <div id="slider_{{ forloop.counter }}" class="carousel slide px-5" data-ride="carousel">
                 <div class="carousel-inner">
-                    {% for book in all_books|books_by_genre:genre %}
+                    {% for book in all_books|books_by_genre:genre|slice:":8" %}
                         {% if forloop.first %}
                             <div class="carousel-item active">
                                 <div class="row">
                         {% endif %}
-                        <div class="col-lg-3 col-md-4 col-sm-6">
-                            <div class="card mb-4">
-                                <div class="image-container p-3" style="height: 250px; overflow: hidden;">
-                                    <img class="card-img-top" src="{{ book.image.url }}" alt="{{ book.title }}" style="width: 100%; height: 250px;">
+                        <div class="col-lg-3 col-md-4 col-sm-6 text-center">
+                            <div class="card mb-4" style="width:90%;">
+                                <div class="image-container p-1 text-center" style="height: 250px; overflow: hidden;">
+                                        <img class="card-img-top" src="{{ book.image.url }}" alt="{{ book.title }}" style="width: 90%; height: 250px;">
                                 </div>
                                 <div class="card-body">
-                                    <h5 class="card-title" style="white-space: normal; height: 50px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">{{ book.title }}</h5>
-                                    <p class="card-text" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0;">Author: {{ book.author }}</p>
-                                    <p class="card-text">Price: ₹ {{ book.price }}</p>
+                                    <h6 class="card-title" style="white-space: normal; height: 40px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">{{ book.title }}</h6>
+                                    <p class="card-text" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0; font-size:15px;">Author: {{ book.author }}</p>
+                                    <p class="card-text" style="font-size:15px;">Price: ₹ {{ book.price }}</p>
                                     {% if book.inventory.stock == 0 %}
-                                        <p class="card-text text-danger">Out of stock</p>
+                                        <p class="card-text text-danger" style="font-size:15px;">Out of stock</p>
                                     {% elif book.inventory.stock > 10 %}
-                                        <p class="card-text text-success">In stock</p>
+                                        <p class="card-text text-success" style="font-size:15px;">In stock</p>
                                     {% else %}
-                                    <p class="card-text" style="color:blue">Only {{ book.inventory.stock }} left</p>
+                                        <p class="card-text" style="color:blue; font-size:15px;">Only {{ book.inventory.stock }} left</p>
                                     {% endif %}
+
                                     <a href="{% url 'book_details' book.id %}" class="btn btn-primary">Details</a>
                                 </div>
                             </div>
@@ -66,10 +67,10 @@ Bookstore
                     </div>
                 </div>
 
-                <a class="carousel-control-prev" href="#slider_{{ forloop.counter }}" role="button" data-slide="prev" style="left: -65px;">
+                <a class="carousel-control-prev" href="#slider_{{ forloop.counter }}" role="button" data-slide="prev" style="left:-5px;max-width:10px; ">
                     <img src="{% static 'icon/arrow-left-circle.svg' %}" alt="Previous" style="width: 50px; height: 50px;">
                 </a>
-                <a class="carousel-control-next" href="#slider_{{ forloop.counter }}" role="button" data-slide="next" style="right: -65px;">
+                <a class="carousel-control-next" href="#slider_{{ forloop.counter }}" role="button" data-slide="next" style="right: -5px;max-width:10px; ">
                     <img src="{% static 'icon/arrow-right-circle.svg' %}" alt="Next" style="width: 50px; height: 50px;">
                 </a>
             </div>
@@ -77,23 +78,23 @@ Bookstore
         {% endfor %}
     {% elif books %}
         <h3 class="mb-4 text-center">Search Result</h3>
-        <div class="row">
+        <div class="row m-3">
             {% for book in books %}
-                <div class="col-lg-3 col-md-4 col-sm-6">
-                    <div class="card mb-4">
-                        <div class="image-container p-3" style="height: 300px; overflow: hidden;">
-                                <img class="card-img-top" src="{{ book.image.url }}" alt="{{ book.title }}" style="width: 100%; height: auto;">
+                <div class="col-lg-3 col-md-4 col-sm-6 text-center">
+                    <div class="card mb-4" style="width:90%;">
+                        <div class="image-container p-1 text-center" style="height: 250px; overflow: hidden;">
+                                <img class="card-img-top" src="{{ book.image.url }}" alt="{{ book.title }}" style="width: 85%; height: 250px;">
                         </div>
                         <div class="card-body">
-                            <h5 class="card-title" style="white-space: normal; height: 50px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">{{ book.title }}</h5>
-                            <p class="card-text" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0;">Author: {{ book.author }}</p>
-                            <p class="card-text">Price: ₹ {{ book.price }}</p>
+                            <h6 class="card-title" style="white-space: normal; height: 40px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">{{ book.title }}</h6>
+                            <p class="card-text" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0; font-size:15px;">Author: {{ book.author }}</p>
+                            <p class="card-text" style="font-size:15px;">Price: ₹ {{ book.price }}</p>
                             {% if book.inventory.stock == 0 %}
-                                <p class="card-text text-danger">Out of stock</p>
+                                <p class="card-text text-danger" style="font-size:15px;">Out of stock</p>
                             {% elif book.inventory.stock > 10 %}
-                                <p class="card-text text-success">In stock</p>
+                                <p class="card-text text-success" style="font-size:15px;">In stock</p>
                             {% else %}
-                                <p class="card-text" style="color:blue">Only {{ book.inventory.stock }} left</p>
+                                <p class="card-text" style="color:blue; font-size:15px;">Only {{ book.inventory.stock }} left</p>
                             {% endif %}
 
                             <a href="{% url 'book_details' book.id %}" class="btn btn-primary">Details</a>
@@ -111,9 +112,10 @@ Bookstore
 
 
 {% block footer_content %}
-    <div class="container text-center">
-    <p> Did  not find your book ? </p>
-    <p>Request instead 
-    <a href={% url 'procure' %} style="font-size:150%">Click <span class="sr-only">(current)</span></a></p>
+    <div class="container text-center mb-4">
+        <h3 class="mb-2">Didn't find your book?</h3>
+        <p class="lead mb-2">Request it instead!</p>
+        <a href="{% url 'procure' %}" class="btn btn-dark ">Request Now</a>
     </div>
+
 {% endblock %}

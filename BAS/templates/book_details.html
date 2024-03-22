@@ -7,9 +7,9 @@ Books Detail
 
 {% block content %}
 <div class="container" style="margin-top:20px;">
-  <a href="javascript:history.back()"><i class="fas fa-arrow-left"></i> Back</a>
+  <a href="{% url 'search' %}"><i class="fas fa-arrow-left"></i> Back to Search</a>
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-4" style="max-width:280px;">
             <img src="{{ book.image.url }}" class="img-fluid" alt="{{ book.title }}">
         </div>
         <div class="col-md-8">
@@ -40,8 +40,9 @@ Books Detail
 
 <div class="container mt-4" style="margin-bottom:10px;">
     <div class="row justify-content-center">
-        <div class="col-md-6">
+        <div class="col-md-6 text-center">
             <h4>Request for the Book</h4>
+            <p class="text-info">If you want to request more quantities than the available stock, please fill out the following form:</p>
             <form id="requestForm" method="POST" action="{% url 'request_book' book.id %}">
                 {% csrf_token %}
                 <input type="hidden" name="book_id" value="{{ book.id }}">

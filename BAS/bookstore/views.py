@@ -7,6 +7,7 @@ from .models import Book,Cart,Inventory, Sales, ProcureBook, RequestBook
 from django.core.mail import send_mail
 from django.conf import settings
 import re
+import random
 
 # Create your views here.
 
@@ -17,8 +18,12 @@ def index(request):
 #---SEARCH-BOOKS---#
 def search(request):
     query = request.GET.get('query') # get query from the form
-    all_books= Book.objects.all()
+    all_books = Book.objects.all()
+    books_list = list(all_books)
+    shuffled_books = random.sample(list(all_books), len(all_books))
+    
     search_type = request.GET.get('search_type')
+    genres=['fiction','self-help','JEE']
 
     if query and search_type: # search for the book either by author name or title in the books table of db
         if search_type == 'author':
@@ -28,11 +33,12 @@ def search(request):
         else:
             books = []
         normal = 0
-    else:
+    else: # if no query show the page with all the books
         books = []
         normal=1
     # render the page search.html  with the list of searched book
-    return render(request, 'search.html', {'books': books, 'request': request, 'genres':['fiction','self-help','JEE'], 'all_books':all_books,'normal':normal})
+    return render(request, 'search.html', {'books': books, 'request': request, 'genres':genres, 'all_books':shuffled_books,'normal':normal})
+
 #---SEARCH-TITLE---#
 def search_books(request):
     print(Book.objects.all())
@@ -85,8 +91,6 @@ def search_authors(request):
     # render the page search.html  with the list of searched book
     return books
 
-# def prev_search_page(request):
-#     return redirect(request.META.get('HTTP_REFERER', 'search'))
 
 #---ADD-A-BOOK-TO-CART---#
 def add_to_cart(request, book_id):
@@ -107,6 +111,9 @@ def add_to_cart(request, book_id):
     if created:
         cart.quantity = quantity
     else:
+        if(cart.quantity+quantity>book.inventory.stock):
+            messages.error(request, f"Less stock for {book.title}")
+            return redirect(request.META.get('HTTP_REFERER', 'search'))
         cart.quantity += quantity
     cart.save() # save the book with quantity in the Cart
     # give a success message that the book is added to the cart and redirect to the previous page
@@ -175,6 +182,11 @@ def send_procure_request(request):
 #---MAKE-BILL-AND-REDUCE-INVENTORY---#
 def proceed_to_buy(request):
     if request.method =='POST': # get the name of buyer, email and phone number from the form
+
+        if not Cart.objects.exists():
+            messages.error(request, "Your cart is empty or Transaction is over...")
+            return redirect('cart')
+
         name = request.POST.get('name')
         email = request.POST.get('email')
         phone = request.POST.get('phone')
@@ -189,20 +201,22 @@ def proceed_to_buy(request):
                 inventory.save()
             else:
                 # Handle insufficient stock situation
-                return HttpResponse("Insufficient stock for some items. Please try again.")
+                messages.error(request,"Insufficient stock for some items. Please try again.")
+                return redirect('cart')
         
         # find the total price
         total_price = sum(cart_item.book.price * cart_item.quantity for cart_item in cart_items)
         # fill the bill content
-        bill_content = f"Buyer Name: {name}<br>Email: {email}<br>Phone Number: {phone}<br><br>Items:<br>"
         bill_email="\n"
+        bill_date= timezone.now().date()
+        bill_time= timezone.now().time()
+        bill_email+="Date: " + str(bill_date) + "\n"
+        bill_email+="Time: " + str(bill_time) + "\n"
 
         for cart_item in cart_items:
-            bill_content += f"{cart_item.book.title} - {cart_item.quantity} - {cart_item.book.price * cart_item.quantity}<br>"
             bill_email+=f"{cart_item.book.title} X {cart_item.quantity} - ₹{cart_item.book.price * cart_item.quantity}\n"  #inside loop
             sales= Sales.objects.create(date=timezone.now(),book=cart_item.book,quantity=cart_item.quantity,revenue=cart_item.book.price * cart_item.quantity)
             sales.save()
-        bill_content += f"<br>Total: ${total_price}"
         bill_email+=f"\nTotal: ₹{total_price}"# just outside loop
 
         #email sending procedure
@@ -215,10 +229,17 @@ def proceed_to_buy(request):
         # delete the cart
         Cart.objects.all().delete()
 
-        # Return the generated bill
-        return HttpResponse(bill_content)
+        context = {
+            'bill_content': bill_email,
+            'bill_date': bill_date,
+            'bill_time': bill_time,
+            'buyer_name': name,
+            'cart_items': cart_items,
+            'total_price': total_price
+        }
+        return render(request, 'bill.html', context)
     else:
-        return HttpResponse("Invalid request method.")
+        return redirect('cart')
 
 def book_details(request,book_id):
     book = get_object_or_404(Book, id=book_id)
@@ -237,11 +258,13 @@ def request_book(request, book_id):
             return render(request, 'your_template.html', {'error_message': 'Invalid quantity. Please enter a positive number.'})
 
         if quantity <= book.inventory.stock:
+            messages.error(request, f"The quantity of {quantity} can be bought with the existing stock !")
             # If the requested quantity is available in stock, handle as a regular purchase
             # You may want to add your purchase logic here
             pass
         else:
             # If the requested quantity exceeds the stock, create a request
+            messages.success(request, f"Request sent for {book.title}")
             RequestBook.objects.create(date_of_request=timezone.now(),book=book, requested_by=requested_by, email=email, quantity=quantity).save()
 
     # Redirect back to the book detail page

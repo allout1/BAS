@@ -23,7 +23,7 @@ Cart
             <tbody>
                 {% for item in cart %}
                     <tr>
-                        <td>{{ item.book.title }}</td>
+                        <td><a href="{% url 'book_details' item.book.id %}">{{ item.book.title }}</a></td>
                         <td>{{ item.book.author }}</td>
                         <td>{{ item.book.price }}</td>
                         <td>{{ item.book.inventory.rack_number}}</td>
@@ -45,8 +45,14 @@ Cart
                 </tr>
             </tfoot>
         </table>
-        <div class="container">
-        <div class="col-md-6 mx-auto">
+
+        <hr style="border: 1px solid black;">
+        <div class="container" >
+        <div class="col-md-6 mx-auto mb-4">
+
+        <div class="container mb-4">
+            <p style="color:dark-green;">Please fill out the form below with your name, email, and phone number to proceed with the purchase:</p>
+        </div>
 
         {% comment %} form to be filled before proceeding to buy  {% endcomment %}
         <form method="POST" action="{% url 'proceed_to_buy' %}" class="row justify-content-center">
