@@ -23,7 +23,7 @@ def search(request):
     shuffled_books = random.sample(list(all_books), len(all_books))
     
     search_type = request.GET.get('search_type')
-    genres=['fiction','self-help','JEE']
+    genres=['fiction','self-help','JEE','children']
 
     if query and search_type: # search for the book either by author name or title in the books table of db
         if search_type == 'author':
