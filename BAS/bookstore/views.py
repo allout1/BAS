@@ -44,7 +44,6 @@ def search(request):
 
 #---SEARCH-TITLE---#
 def search_books(request):
-    print(Book.objects.all())
     query = str(request.GET.get('query')) # get query from the form
     query = query.replace(' ','')
     query = query.lower()
