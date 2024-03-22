@@ -23,6 +23,7 @@ def create_inventory(sender, instance, created, **kwargs):
     """
     if created:
         Inventory.objects.create(book=instance, stock=0)
+        Vendor_list.objects.create(book=book)
 
 class RequestBook(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
@@ -77,10 +78,16 @@ class Vendor(models.Model):
     phone= models.IntegerField()
     address= models.CharField(max_length=200)
 
+    def __str__(self):
+        return self.name
+
 class Vendor_list(models.Model):
     book = models.OneToOneField(Book, on_delete=models.CASCADE)
-    vendor= models.ForeignKey(Vendor,on_delete=models.CASCADE)
-    threshold= models.IntegerField()
+    vendor= models.ForeignKey(Vendor,on_delete=models.CASCADE,null=True)
+    threshold= models.IntegerField(default=20)
+
+    def __str__(self):
+        return self.book.title
     
 
 

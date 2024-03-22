@@ -1,0 +1,48 @@
+<!-- book_threshold_page.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Books Below Threshold</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Optional custom styles */
+        body {
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mb-4">Books Below Threshold</h1>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Title</th>
+                        <th>Vendor</th>
+                        <th>Publisher</th>
+                        <th>Stock</th>
+                        <th>Threshold</th>
+                        <!-- Add more columns as needed -->
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for book in books_below_threshold %}
+                    <tr>
+                        <td>{{ book.title }}</td>
+                        <td>{{ book.vendor_list.vendor.name }}</td>
+                        <td>{{ book.publisher }}</td>
+                        <td>{{ book.inventory.stock }}</td>
+                        <td>{{ book.vendor_list.threshold }}</td>
+                        <!-- Add more columns as needed -->
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

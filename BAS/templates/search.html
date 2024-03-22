@@ -52,7 +52,7 @@ Bookstore
                                         <p class="card-text" style="color:blue; font-size:15px;">Only {{ book.inventory.stock }} left</p>
                                     {% endif %}
 
-                                    <a href="{% url 'book_details' book.id %}" class="btn btn-primary">Details</a>
+                                    <a href="{% url 'book_details' book.id %}" class="btn btn-primary" target="_blank">Details</a>
                                 </div>
                             </div>
                         </div>
@@ -98,7 +98,7 @@ Bookstore
                                 <p class="card-text" style="color:blue; font-size:15px;">Only {{ book.inventory.stock }} left</p>
                             {% endif %}
 
-                            <a href="{% url 'book_details' book.id %}" class="btn btn-primary">Details</a>
+                            <a href="{% url 'book_details' book.id %}" class="btn btn-primary" target="_blank">Details</a>
                         </div>
                     </div>
                 </div>

@@ -3,11 +3,14 @@ from django.contrib import messages
 from bookstore import views
 from django.db.models import Q
 from django.utils import timezone
-from .models import Book,Cart,Inventory, Sales, ProcureBook, RequestBook
+from datetime import timedelta
+from .models import Book,Cart,Inventory, Sales, ProcureBook, RequestBook, Vendor_list
 from django.core.mail import send_mail
 from django.conf import settings
 import re
 import random
+from django.contrib.admin.views.decorators import staff_member_required
+from django.core.exceptions import ObjectDoesNotExist
 
 # Create your views here.
 
@@ -269,3 +272,34 @@ def request_book(request, book_id):
 
     # Redirect back to the book detail page
     return redirect(request.META.get('HTTP_REFERER', 'book_details'))
+
+@staff_member_required
+def book_threshold_page(request):
+    # Calculate the date range for the last two weeks
+    two_weeks_ago = timezone.now() - timedelta(days=14)
+    
+    # Retrieve all books and calculate their threshold
+    books = Book.objects.all()
+    books_below_threshold = []
+
+    for book in books:
+        # vendor_list= Vendor_list.objects.get(book=book)
+        # Count the number of sales for the book in the last two weeks
+        sales_count = Sales.objects.filter(book=book, date__gte=two_weeks_ago).count()
+        # Calculate the threshold for the book
+        threshold = 20 + sales_count
+
+        try:
+        # Access the related Vendor_list
+            vendor_list = book.vendor_list  # This will return the related Vendor_list instance
+        except ObjectDoesNotExist:
+            # Handle the case where the related Vendor_list does not exist
+            Vendor_list.objects.create(book=book)  # or take appropriate action based on your application logic
+            vendor_list= book.vendor_list
+
+        vendor_list.threshold=threshold
+        # If the quantity is less than the threshold, add the book to the list
+        if book.inventory.stock < threshold:
+            books_below_threshold.append(book)
+
+    return render(request, 'book_threshold.html', {'books_below_threshold': books_below_threshold})
