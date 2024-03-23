@@ -17,5 +17,5 @@ urlpatterns = [
     path('proceed_to_buy/', views.proceed_to_buy, name='proceed_to_buy'),
     path('send-procure-request/', views.send_procure_request, name='send_procure_request'),
     path('book_details/<int:book_id>/', views.book_details, name='book_details'),
-    path('book-threshold/', views.book_threshold_page, name='book_threshold_page'),
+    # path('book-threshold/', views.book_threshold_page, name='book_threshold_page'),
 ]

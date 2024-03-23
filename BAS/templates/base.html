@@ -33,10 +33,10 @@
             </li>
             {% comment %} link to request page  {% endcomment %}
             {% comment %} clear cart and start a new shopping {% endcomment %}
-            <li>
+            <li class="text-right">
                 <form action="{% url 'clear_cart' %}" method="post">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-light custom-button" style="margin-left:700px; margin-top:5px;">Start Shopping</button>
+                    <button type="submit" class="btn btn-light custom-button" style="margin-left:600%; margin-top:5px;">Start Shopping</button>
                 </form>
             </li>
             <!-- Add other links here -->
