@@ -16,12 +16,18 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.shortcuts import redirect
 
-admin.site.site_header= "MANAGER"
-admin.site.site_title= "MANAGER LOGIN"
+admin.site.site_header= "AUTHORISED LOGIN"
+admin.site.site_title= "AUTHORISED LOGIN"
 admin.site.index_title= "Welcome to Bookstore Management Portal"
 
+from bookstore.views import logout_view
+
 urlpatterns = [
+    path('logout/', logout_view, name='logout'),
+    # note the override comes before the admin URLs below
+    path('admin/logout/', lambda request: redirect('/logout/', permanent=False)),
     path('admin/', admin.site.urls, name='admin'),
     path('',include('bookstore.urls')),
 ]

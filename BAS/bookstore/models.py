@@ -63,6 +63,16 @@ class Inventory(models.Model):
     def __str__(self):
         return f"{self.book.title} - {self.stock}"
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # Update corresponding Vendor_list stock
+        try:
+            vendor_list = Vendor_list.objects.get(book=self.book)
+            vendor_list.stock = self.stock
+            vendor_list.save()
+        except Vendor_list.DoesNotExist:
+            pass  # Handle the case where Vendor_list doesn't exist for this book
+
 class Sales(models.Model):
     date= models.DateTimeField()
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
@@ -86,6 +96,7 @@ class Vendor_list(models.Model):
     book = models.OneToOneField(Book, on_delete=models.CASCADE)
     vendor= models.ForeignKey(Vendor,on_delete=models.CASCADE,null=True)
     threshold= models.IntegerField(default=20)
+    stock= models.IntegerField(default=0)
 
     def __str__(self):
         return self.book.title

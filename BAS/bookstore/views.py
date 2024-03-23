@@ -1,4 +1,5 @@
 from django.shortcuts import render,redirect, get_object_or_404, HttpResponse
+from django.contrib.auth import logout
 from django.contrib import messages
 from bookstore import views
 from django.db.models import Q
@@ -17,6 +18,12 @@ from django.core.exceptions import ObjectDoesNotExist
 #---HOME-PAGE---#
 def index(request):
     return render(request,'index.html') # return the home page
+
+def logout_view(request):
+  logout(request)
+  response = redirect('home')
+  response.delete_cookie('example_cookie')
+  return response
 
 #---SEARCH-BOOKS---#
 def search(request):

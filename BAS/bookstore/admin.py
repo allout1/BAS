@@ -29,6 +29,16 @@ class SalesAdmin(admin.ModelAdmin):
         "book" 
     )
 
+    # def total_revenue(self, obj):
+    #     # Calculate total revenue of filtered objects
+    #     queryset = self.get_queryset(obj)
+    #     total_revenue = queryset.aggregate(total_revenue=Sum('revenue'))['total_revenue']
+    #     return total_revenue or 0  # Return 0 if no revenue found
+
+    # total_revenue.short_description = 'Total Revenue'
+    # total_revenue.admin_order_field = 'revenue'  # Allow sorting by total revenue
+    # total_revenue.readonly = True  # Make it readonly in the admin interface
+
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
     list_display = ('title', 'author', 'isbn', 'publisher','price')
@@ -85,7 +95,7 @@ class ThresholdFIlter(admin.SimpleListFilter):
 
 @admin.register(Vendor_list)
 class RequestBookAdmin(admin.ModelAdmin):
-    list_display = ('book', 'vendor','threshold')
+    list_display = ('book', 'vendor','threshold','stock')
     list_filter= [ThresholdFIlter]
 
 @admin.register(Vendor)

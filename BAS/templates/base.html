@@ -8,15 +8,27 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
 
     <title>{% block title %}{% endblock %}</title>
+
+    <style>
+        .satisfy-regular {
+            font-family: "Satisfy", cursive;
+            font-weight: 400;
+            font-style: normal;
+            font-size:35px;
+        }
+    </style>
   </head>
   <body>
     {% comment %} adding the navbar  {% endcomment %}
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 
     {% comment %} move to home page {% endcomment %}
-    <a class="navbar-brand" href={% url 'home' %} style="font-size:200%; color:#FFDB58;">Bookstore</a> 
+    <a class="navbar-brand" href={% url 'home' %} style="font-size:200%; color:#FFDB58;">Bookshop</a> 
     
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
