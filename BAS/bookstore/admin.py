@@ -25,7 +25,8 @@ class SalesAdmin(admin.ModelAdmin):
     ordering= ('-date',)  # Hierarchical date-based navigation
 
     list_filter=(
-        ("date",DateRangeFilter),    
+        ("date",DateRangeFilter), 
+        "book" 
     )
 
 @admin.register(Book)
