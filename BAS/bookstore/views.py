@@ -217,7 +217,7 @@ def proceed_to_buy(request):
 
         for cart_item in cart_items:
             bill_email+=f"{cart_item.book.title} X {cart_item.quantity} - ₹{cart_item.book.price * cart_item.quantity}\n"  #inside loop
-            sales= Sales.objects.create(date=timezone.now(),book=cart_item.book,quantity=cart_item.quantity,revenue=cart_item.book.price * cart_item.quantity)
+            sales= Sales.objects.create(date=timezone.now(),book=cart_item.book,quantity=cart_item.quantity,revenue=cart_item.book.price * cart_item.quantity,buyer_name=name)
             sales.save()
         bill_email+=f"\nTotal: ₹{total_price}"# just outside loop
 

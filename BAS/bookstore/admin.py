@@ -21,7 +21,7 @@ admin.site.register(Cart)
 
 @admin.register(Sales)
 class SalesAdmin(admin.ModelAdmin):
-    list_display = ('date', 'book', 'revenue', 'quantity')
+    list_display = ('date', 'book','buyer_name', 'revenue', 'quantity')
     ordering= ('-date',)  # Hierarchical date-based navigation
 
     list_filter=(

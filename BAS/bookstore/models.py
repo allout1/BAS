@@ -68,6 +68,7 @@ class Sales(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     revenue= models.DecimalField(max_digits=10,decimal_places=2)
     quantity=models.IntegerField(default=0)
+    buyer_name= models.CharField(max_length=100,default="")
 
     def __str__(self):
         return f"{self.date} - {self.book.title}"
