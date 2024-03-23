@@ -23,7 +23,7 @@ def create_inventory(sender, instance, created, **kwargs):
     """
     if created:
         Inventory.objects.create(book=instance, stock=0)
-        Vendor_list.objects.create(book=book)
+        Vendor_list.objects.create(book=instance)
 
 class RequestBook(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)

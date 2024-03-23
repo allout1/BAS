@@ -12,7 +12,7 @@ from django.db.models import Sum, F
 # admin.site.register(Book)
 # admin.site.register(RequestBook)
 admin.site.register(ProcureBook)
-admin.site.register(Cart)
+# admin.site.register(Cart)
 # admin.site.register(Inventory)
 # admin.site.register(Sales)
 # admin.site.register(Vendor)
