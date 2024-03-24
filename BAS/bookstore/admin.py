@@ -65,13 +65,13 @@ class SalesAdmin(admin.ModelAdmin):
         dates = list(date_revenues.keys())
         revenues = list(date_revenues.values())
 
-        plt.figure(figsize=(6, 4))
+        plt.figure(figsize=(7, 6))
         plt.plot(dates, revenues)
-        plt.title('Total Revenue vs Date')
-        plt.xlabel('Date')
-        plt.ylabel('Total Revenue')
+        plt.title('TOTAL REVENUE v/s DATE')
+        plt.xlabel('DATE')
+        plt.ylabel('TOTAL REVENUE (in ₹)')
         plt.grid(True)
-        plt.xticks(rotation=45)
+        plt.xticks(rotation=90)
         plt.tight_layout()
 
         # Convert plot to PNG image

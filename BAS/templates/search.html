@@ -7,17 +7,75 @@ Bookstore
 {% endblock %}
 
 {% block content %}
-
+<style>
+    div {
+        display: block;
+        unicode-bidi: isolate;
+    }
+    .ticker-container {
+        width: 100%;
+        overflow: hidden;
+        position: static;
+        margin-top: 15px;
+        }
+        .ticker-wrapper {
+        width: 100%;
+        padding-left: 100%;
+        
+        background-color: transparent;
+        }
+        @keyframes ticker {
+        0% {
+        transform: translate3d(0, 0, 0);
+        }
+        100% {
+        transform: translate3d(-200%, 0, 0);
+        }
+        }
+        .ticker-transition {
+        display: inline-block;
+        white-space: nowrap;
+        font-size: 30px;
+        
+        padding-right: 100%;
+        animation-iteration-count: infinite;
+        animation-timing-function: linear;
+        animation-name: ticker;
+        animation-duration: 17s;
+        }
+        .ticker-transition:hover {
+        animation-play-state: paused;
+        cursor: pointer;
+        }
+        .ticker-item {
+        display: inline-block;
+        padding: 0 2rem;
+        font-family:TimesNewRoman;
+        color:grey;
+        
+        }
+        
+</style>
+<div class="ticker-container">
+    <div class="ticker-wrapper">
+    <div class="ticker-transition">
+    <div class="ticker-item">BookShop welcomes you</div>
+    <div class="ticker-item">Click On Start Shopping for a wonderful experience</div>
+    <div class="ticker-item">Click on Cart to view Items</div>
+    {% comment %} <div class="ticker-item">Login as Employee</div> {% endcomment %}
+    </div>
+    </div>
+</div>
 <div class="container">
-    <h2 class="mb-4 text-center satisfy-regular mt-3">Discover Captivating Reads...</h2>
+    <h1 class="mb-4 text-center satisfy-regular mt-3" style="font-size:40px;">Discover Captivating Reads...</h1>
     <!-- form for searching a book by author or title -->
     <form method="GET" action="{% url 'search' %}">
         <div>
-            <label><input type="radio" name="search_type" value="author" required> Search by Author </label>
-            <label><input type="radio" name="search_type" value="title" class="ml-5" required> Search by Title</label>
+            <label><p style="font-size:26px;font-family:Times New Roman"><input type="radio" name="search_type" value="title"  required checked> Search by Title</p></label>
+            <label><p style="font-size:26px;font-family:Times New Roman"><input type="radio" name="search_type" value="author" class="ml-5"style="font-size:26px;" required> Search by Author </p></label>
         </div>
         <div class="input-group mb-3">
-            <input type="text" class="form-control" placeholder="Search by title or author" name="query" value="{{ request.GET.query }}" required>
+            <input type="text" class="form-control" placeholder="Search for your favourite title or author" name="query" value="{{ request.GET.query }}" required>
             <div class="input-group-append">
                 <button class="btn btn-outline-secondary btn-sm" type="submit">Search</button>
             </div>
@@ -115,8 +173,8 @@ Bookstore
 {% block footer_content %}
     <div class="container text-center mb-4">
         <h3 class="mb-2">Didn't find your book?</h3>
-        <p class="lead mb-2">Request it instead!</p>
-        <a href="{% url 'procure' %}" class="btn btn-dark ">Request Now</a>
+        <p class="mb-2" style="font-size:26px; font family:arial;">Request instead!</p>
+        <a href="{% url 'procure' %}" class="btn btn-success ">Request Now</a>
     </div>
 
 {% endblock %}
