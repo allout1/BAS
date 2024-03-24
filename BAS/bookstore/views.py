@@ -10,8 +10,8 @@ from django.core.mail import send_mail
 from django.conf import settings
 import re
 import random
-from django.contrib.admin.views.decorators import staff_member_required
-from django.core.exceptions import ObjectDoesNotExist
+# from django.contrib.admin.views.decorators import staff_member_required
+# from django.core.exceptions import ObjectDoesNotExist
 
 # Create your views here.
 
@@ -19,20 +19,21 @@ from django.core.exceptions import ObjectDoesNotExist
 def index(request):
     return render(request,'index.html') # return the home page
 
+#---LOG-OUT-OF-ADMIN-PAGE---#
 def logout_view(request):
-  logout(request)
-  response = redirect('home')
-  response.delete_cookie('example_cookie')
+  logout(request) # remove any authenticated user
+  response = redirect('home') # redirect to the index.html page
+  response.delete_cookie('example_cookie') # delete  the cookie named example_cookie
   return response
 
 #---SEARCH-BOOKS---#
 def search(request):
     query = request.GET.get('query') # get query from the form
+    search_type = request.GET.get('search_type') # get the query type i.e. by author or title
+
     all_books = Book.objects.all()
-    books_list = list(all_books)
     shuffled_books = random.sample(list(all_books), len(all_books))
     
-    search_type = request.GET.get('search_type')
     genres=['fiction','self-help','JEE','children']
 
     if query and search_type: # search for the book either by author name or title in the books table of db
@@ -45,7 +46,7 @@ def search(request):
         normal = 0
     else: # if no query show the page with all the books
         books = []
-        normal=1
+        normal=1 # normal is the parameter which decides whether normal page is to be shown or searched results
     # render the page search.html  with the list of searched book
     return render(request, 'search.html', {'books': books, 'request': request, 'genres':genres, 'all_books':shuffled_books,'normal':normal})
 
@@ -219,8 +220,6 @@ def proceed_to_buy(request):
         bill_email="\n"
         bill_date= timezone.now().date()
         bill_time= timezone.now().time()
-        bill_email+="Date: " + str(bill_date) + "\n"
-        bill_email+="Time: " + str(bill_time) + "\n"
 
         for cart_item in cart_items:
             bill_email+=f"{cart_item.book.title} X {cart_item.quantity} - ₹{cart_item.book.price * cart_item.quantity}\n"  #inside loop
@@ -250,11 +249,12 @@ def proceed_to_buy(request):
     else:
         return redirect('cart')
 
+#---OPEN-BOOK_DETAILS-PAGE---#
 def book_details(request,book_id):
     book = get_object_or_404(Book, id=book_id)
     return render(request, 'book_details.html',{'book':book})
 
-
+#---REQUEST-BOOK-IF-STOCK-OUT---#
 def request_book(request, book_id):
     book = get_object_or_404(Book, id=book_id)
 

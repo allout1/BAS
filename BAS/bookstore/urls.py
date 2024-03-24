@@ -5,17 +5,26 @@ from . import views
 # app_name = "bookstore"
 
 urlpatterns = [
+    # home page
     path('',views.index,name='home'),
+    # search page
     path('search/',views.search, name='search'),
-    # path('prev_search',views.prev_search_page,name='prev_search'),
-    path("cart/", views.cart, name="cart"),
+    # add a book to cart
     path("add_to_cart/<int:book_id>/", views.add_to_cart, name="add_to_cart"),
-    path("remove_from_cart/<int:book_id>/", views.remove_from_cart, name="remove_from_cart"),
-    path('clear-cart/', views.clear_cart, name='clear_cart'),
-    path('procure/',views.procure,name='procure'),
-    path('request_book/<int:book_id>/',views.request_book,name='request_book'),
-    path('proceed_to_buy/', views.proceed_to_buy, name='proceed_to_buy'),
-    path('send-procure-request/', views.send_procure_request, name='send_procure_request'),
+    # book details page
     path('book_details/<int:book_id>/', views.book_details, name='book_details'),
-    # path('book-threshold/', views.book_threshold_page, name='book_threshold_page'),
+    # cart page
+    path("cart/", views.cart, name="cart"), 
+    # remove a book from cart
+    path("remove_from_cart/<int:book_id>/", views.remove_from_cart, name="remove_from_cart"),
+    # empty the cart
+    path('clear-cart/', views.clear_cart, name='clear_cart'),
+    # procure a new book page
+    path('procure/',views.procure,name='procure'),
+    # send procurement request
+    path('send-procure-request/', views.send_procure_request, name='send_procure_request'),
+    # request a book having less stock
+    path('request_book/<int:book_id>/',views.request_book,name='request_book'),
+    # proceed to buy and generate bill
+    path('proceed_to_buy/', views.proceed_to_buy, name='proceed_to_buy'),
 ]

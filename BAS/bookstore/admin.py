@@ -4,40 +4,10 @@ from datetime import datetime,timedelta
 from rangefilter.filters import DateRangeFilter
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
-
 from django.db.models import Sum, F 
-
-
-
-# admin.site.register(Book)
-# admin.site.register(RequestBook)
-admin.site.register(ProcureBook)
-# admin.site.register(Cart)
-# admin.site.register(Inventory)
-# admin.site.register(Sales)
-# admin.site.register(Vendor)
-# admin.site.register(Vendor_list)
-
-
-@admin.register(Sales)
-class SalesAdmin(admin.ModelAdmin):
-    list_display = ('date', 'book','buyer_name', 'revenue', 'quantity')
-    ordering= ('-date',)  # Hierarchical date-based navigation
-
-    list_filter=(
-        ("date",DateRangeFilter), 
-        "book" 
-    )
-
-    # def total_revenue(self, obj):
-    #     # Calculate total revenue of filtered objects
-    #     queryset = self.get_queryset(obj)
-    #     total_revenue = queryset.aggregate(total_revenue=Sum('revenue'))['total_revenue']
-    #     return total_revenue or 0  # Return 0 if no revenue found
-
-    # total_revenue.short_description = 'Total Revenue'
-    # total_revenue.admin_order_field = 'revenue'  # Allow sorting by total revenue
-    # total_revenue.readonly = True  # Make it readonly in the admin interface
+import matplotlib.pyplot as plt
+import io
+import base64
 
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
@@ -55,6 +25,67 @@ class RequestBookAdmin(admin.ModelAdmin):
     list_display = ('date_of_request', 'book', 'requested_by', 'quantity')
     ordering= ('date_of_request',)  # Hierarchical date-based navigation
     search_fields= ('requested_by',)
+
+@admin.register(ProcureBook)
+class ProcureBookAdmin(admin.ModelAdmin):
+    list_display = ('user_name', 'book_title', )
+
+@admin.register(Sales)
+class SalesAdmin(admin.ModelAdmin):
+    list_display = ('date', 'book','buyer_name', 'revenue', 'quantity')
+    ordering= ('-date',)  # Hierarchical date-based navigation
+
+    list_filter=(
+        ("date",DateRangeFilter), 
+        "book" 
+    )
+
+    change_list_template = 'admin/sales_change_list.html'
+
+    def changelist_view(self, request, extra_context=None):
+        response = super().changelist_view(request, extra_context=extra_context)
+        queryset = response.context_data['cl'].queryset
+        total_revenue = queryset.aggregate(total_revenue=Sum('revenue'))['total_revenue']
+        graph_data= self.revenue_graph(queryset)
+        response.context_data['total_revenue'] = total_revenue if total_revenue is not None else 0
+        response.context_data['graph_data']=graph_data
+        return response
+
+    def revenue_graph(self, queryset):
+        date_revenues = {}  # Dictionary to store total revenues for each date
+
+        # Aggregate revenues for each date
+        for sale in queryset:
+            date = sale.date.date()  # Extract date portion
+            if date in date_revenues:
+                date_revenues[date] += sale.revenue
+            else:
+                date_revenues[date] = sale.revenue
+
+        dates = list(date_revenues.keys())
+        revenues = list(date_revenues.values())
+
+        plt.figure(figsize=(6, 4))
+        plt.plot(dates, revenues)
+        plt.title('Total Revenue vs Date')
+        plt.xlabel('Date')
+        plt.ylabel('Total Revenue')
+        plt.grid(True)
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+
+        # Convert plot to PNG image
+        buffer = io.BytesIO()
+        plt.savefig(buffer, format='png')
+        buffer.seek(0)
+        plt.close()
+
+        encoded_image = base64.b64encode(buffer.getvalue()).decode('utf-8')
+
+        # Return a template response with the plot image
+        return encoded_image
+
+    
 
 class ThresholdFIlter(admin.SimpleListFilter):
     title= _("Threshold")

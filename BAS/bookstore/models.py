@@ -25,6 +25,25 @@ def create_inventory(sender, instance, created, **kwargs):
         Inventory.objects.create(book=instance, stock=0)
         Vendor_list.objects.create(book=instance)
 
+class Inventory(models.Model):
+    book = models.OneToOneField(Book, on_delete=models.CASCADE)
+    stock = models.IntegerField(default=0)
+    rack_number = models.CharField(max_length=1)
+
+    def __str__(self):
+        return f"{self.book.title} - {self.stock}"
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # Update corresponding Vendor_list stock
+        try:
+            vendor_list = Vendor_list.objects.get(book=self.book)
+            vendor_list.stock = self.stock
+            vendor_list.save()
+        except Vendor_list.DoesNotExist:
+            pass  # Handle the case where Vendor_list doesn't exist for this book
+
+
 class RequestBook(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     requested_by = models.CharField(max_length=50)
@@ -55,23 +74,6 @@ class Cart(models.Model):
     def __str__(self):
         return f"{self.book.title}-{self.quantity}"
 
-class Inventory(models.Model):
-    book = models.OneToOneField(Book, on_delete=models.CASCADE)
-    stock = models.IntegerField(default=0)
-    rack_number = models.CharField(max_length=1)
-
-    def __str__(self):
-        return f"{self.book.title} - {self.stock}"
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        # Update corresponding Vendor_list stock
-        try:
-            vendor_list = Vendor_list.objects.get(book=self.book)
-            vendor_list.stock = self.stock
-            vendor_list.save()
-        except Vendor_list.DoesNotExist:
-            pass  # Handle the case where Vendor_list doesn't exist for this book
 
 class Sales(models.Model):
     date= models.DateTimeField()
