@@ -70,6 +70,7 @@ class ProcureBook(models.Model):
 class Cart(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     quantity = models.IntegerField()
+    revenue= models.DecimalField(max_digits=8, decimal_places=2,default=0)
 
     def __str__(self):
         return f"{self.book.title}-{self.quantity}"

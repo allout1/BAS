@@ -120,11 +120,13 @@ def add_to_cart(request, book_id):
     
     if created:
         cart.quantity = quantity
+        cart.revenue = quantity*book.price
     else:
         if(cart.quantity+quantity>book.inventory.stock):
             messages.error(request, f"Less stock for {book.title}")
             return redirect(request.META.get('HTTP_REFERER', 'search'))
         cart.quantity += quantity
+        cart.revenue += quantity*book.price
     cart.save() # save the book with quantity in the Cart
     # give a success message that the book is added to the cart and redirect to the previous page
     messages.success(request, f"{book.title} added to cart.")
