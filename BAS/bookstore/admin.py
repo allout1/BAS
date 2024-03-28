@@ -47,6 +47,7 @@ class SalesAdmin(admin.ModelAdmin):
     def changelist_view(self, request, extra_context=None):
         response = super().changelist_view(request, extra_context=extra_context)
         queryset = response.context_data['cl'].queryset
+        print(queryset)
         total_revenue = queryset.aggregate(total_revenue=Sum('revenue'))['total_revenue']
         graph_data= self.revenue_graph(queryset)
         response.context_data['total_revenue'] = total_revenue if total_revenue is not None else 0
@@ -67,7 +68,7 @@ class SalesAdmin(admin.ModelAdmin):
         dates = list(date_revenues.keys())
         revenues = list(date_revenues.values())
 
-        plt.figure(figsize=(7, 6))
+        plt.figure(figsize=(6.5, 6))
         plt.plot(dates, revenues)
         plt.title('TOTAL REVENUE v/s DATE')
         plt.xlabel('DATE')

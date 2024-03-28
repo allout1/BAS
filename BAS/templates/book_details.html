@@ -42,25 +42,13 @@ Books Detail
     <div class="row justify-content-center">
         <div class="col-md-6 text-center">
             <h4>Request for the Book</h4>
-            <p class="text-info">If you want to request more quantities than the available stock, please fill out the following form:</p>
+            <p class="text-info">If you want to request more quantities than the available stock, please fill out the required quantity:</p>
             <form id="requestForm" method="POST" action="{% url 'request_book' book.id %}">
                 {% csrf_token %}
                 <input type="hidden" name="book_id" value="{{ book.id }}">
-                <div class="form-group row">
-                    <label for="name" class="col-sm-3 col-form-label">Name:</label>
-                    <div class="col-sm-9">
-                        <input type="text" class="form-control" id="name" name="name" required>
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label for="email" class="col-sm-3 col-form-label">Email:</label>
-                    <div class="col-sm-9">
-                        <input type="email" class="form-control" id="email" name="email" required>
-                    </div>
-                </div>
-                <div class="form-group row">
+                <div class="form-group row justify-content-center">
                     <label for="quantity" class="col-sm-3 col-form-label">Quantity:</label>
-                    <div class="col-sm-9">
+                    <div class="col-sm-3">
                         <input type="number" class="form-control" id="quantity" name="quantity" min={{book.inventory.stock|add:1}} placeholder={{book.inventory.stock|add:1}} required>
                     </div>
                 </div>

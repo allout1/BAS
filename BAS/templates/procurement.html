@@ -10,14 +10,6 @@ procure
     <form class="row g-3 justify-content-center" action="{% url 'send_procure_request' %}" method="post">
     {% csrf_token %}
         <div class="col-md-5">
-          <label for="inputname4" class="form-label">Name of Customer *</label>
-          <input type="text" class="form-control" id="inputname4" name="user_name" placeholder="XYZ ABC" required>
-        </div>
-        <div class="col-md-5">
-          <label for="inputemail4" class="form-label">Email *</label>
-          <input type="email" class="form-control" id="inputemail4" name="email" placeholder="xyz@gmail.com" required>
-        </div>
-        <div class="col-md-5">
           <label for="inputphone" class="form-label">Phone Number *</label>
           <input type="number" class="form-control" id="inputphone" name="phone_no" placeholder="+91" required>
         </div>

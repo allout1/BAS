@@ -216,8 +216,8 @@ def procure(request):
 def send_procure_request(request):
     if request.method == 'POST':
         # Get data from the request
-        user_name = request.POST.get('user_name')
-        email = request.POST.get('email')
+        user_name = request.user.username
+        email = request.user.email
         phone_no = request.POST.get('phone_no')
         book_title = request.POST.get('book_title')
         author_name = request.POST.get('author_name')
@@ -255,9 +255,14 @@ def proceed_to_buy(request):
             messages.error(request, "Your cart is empty or Transaction is over...")
             return redirect('cart')
 
-        name = request.POST.get('name')
-        email = request.POST.get('email')
-        phone = request.POST.get('phone')
+        # Check if the confirmation checkbox is checked
+        confirmation_checked = request.POST.get('confirmation_checkbox')
+        if confirmation_checked != 'on':
+            messages.error(request, "Please confirm your purchase by checking the checkbox.")
+            return redirect('cart')
+
+        name = request.user.username
+        email = request.user.email
 
         for cart_item in cart:
             book = cart_item.book
@@ -300,7 +305,7 @@ def proceed_to_buy(request):
             'total_price': total_price
         }
          # delete the cart
-        cart.delete()
+        Cart.objects.filter(user=request.user).delete()
         return render(request, 'bill.html', context)
     else:
         return redirect('cart')
@@ -316,8 +321,8 @@ def request_book(request, book_id):
     book = get_object_or_404(Book, id=book_id)
 
     if request.method == 'POST':
-        requested_by = request.POST.get('name')
-        email = request.POST.get('email')
+        requested_by = request.user.username
+        email = request.user.email
         quantity = int(request.POST.get('quantity'))
 
         if quantity <= 0:

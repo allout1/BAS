@@ -53,23 +53,15 @@ Cart
         <div class="col-md-6 mx-auto mb-4">
 
         <div class="container mb-4">
-            <p style="color:dark-green;">Please fill out the form below with your name, email, and phone number to proceed with the purchase:</p>
+            <p style="color:dark-green;">Please confirm to proceed with the purchase:</p>
         </div>
 
         {% comment %} form to be filled before proceeding to buy  {% endcomment %}
         <form method="POST" action="{% url 'proceed_to_buy' %}" class="row justify-content-center">
             {% csrf_token %}
-            <div class="col-md-4">
-                <label for="name" class="form-label">Name:</label>
-                <input type="text" class="form-control" name='name' required>
-            </div>
-            <div class="col-md-4">
-                <label for="email" class="form-label">Email:</label>
-                <input type="email" class="form-control" name='email' placeholder="xyz@gmail.com" required>
-            </div>
-            <div class="col-md-4">
-                <label for="phone" class="form-label">Phone Number:</label>
-                <input type="tel" class="form-control" name='phone' placeholder="+91" required>
+            <div class="form-group form-check">
+                <input type="checkbox" class="form-check-input" id="confirmation_checkbox" name="confirmation_checkbox">
+                <label class="form-check-label" for="confirmation_checkbox">I confirm that I want to proceed with the purchase</label>
             </div>
             <div class="col-md-12 text-center mt-3"> <!-- Adjust the column width and alignment as needed -->
                 <button type="submit" class="btn btn-primary">Proceed to Pay</button>
