@@ -52,7 +52,7 @@
         </table>
         <div class="mt-3">Total Amount: {{ total_price }}</div>
         <p>Bill has been sent to your email.</p>
-        <form action="{% url 'home' %}" method="post">
+        <form action="{% url 'clear_cart_logout' %}" method="post">
             {% csrf_token %}
             <button type="submit" class="btn btn-primary btn-exit">Exit Transaction</button>
         </form>

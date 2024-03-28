@@ -9,6 +9,8 @@ import matplotlib.pyplot as plt
 import io
 import base64
 
+admin.site.register(Cart)
+
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
     list_display = ('title', 'author', 'isbn', 'publisher','price')

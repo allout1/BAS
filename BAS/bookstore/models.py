@@ -1,6 +1,12 @@
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
+
+# class CustomUser(AbstractUser):
+#     # Add any additional fields here
+#     pass
 
 # Create your models here.
 class Book(models.Model):
@@ -68,12 +74,17 @@ class ProcureBook(models.Model):
         return f"{self.book_title}-{self.user_name}"
 
 class Cart(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE,default="")
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     quantity = models.IntegerField()
     revenue= models.DecimalField(max_digits=8, decimal_places=2,default=0)
 
     def __str__(self):
         return f"{self.book.title}-{self.quantity}"
+
+    def update_revenue(self):
+        self.revenue = self.quantity * self.book.price
+        self.save()
 
 
 class Sales(models.Model):

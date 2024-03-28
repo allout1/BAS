@@ -29,5 +29,6 @@ urlpatterns = [
     # note the override comes before the admin URLs below
     path('admin/logout/', lambda request: redirect('/logout/', permanent=False)),
     path('admin/', admin.site.urls, name='admin'),
+    path('accounts/', include('django.contrib.auth.urls')),
     path('',include('bookstore.urls')),
 ]

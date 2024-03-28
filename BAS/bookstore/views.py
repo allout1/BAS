@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect, get_object_or_404, HttpResponse
-from django.contrib.auth import logout
+from django.contrib.auth import logout, login, authenticate
 from django.contrib import messages
 from bookstore import views
 from django.db.models import Q
@@ -10,10 +10,42 @@ from django.core.mail import send_mail
 from django.conf import settings
 import re
 import random
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 # from django.contrib.admin.views.decorators import staff_member_required
 # from django.core.exceptions import ObjectDoesNotExist
 
 # Create your views here.
+
+def login_view(request):
+    if request.method == 'POST':
+        email = request.POST['email']
+        password = request.POST['password']
+        user = authenticate(request, email=email, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('search')  # Redirect to the homepage
+        messages.error(request, 'Email or password is incorrect')    
+    return render(request, 'registration/login.html')
+
+def register_view(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        email = request.POST['email']
+        password1 = request.POST['password1']
+        password2 = request.POST['password2']
+        if password1 == password2:
+            if User.objects.filter(email=email).exists():
+                messages.error(request, 'Username is already taken')
+                return render(request, 'registration/register.html')
+            else:
+                user = User.objects.create_user(username=username, email=email, password=password1)
+                login(request, user)
+                return redirect('search')  # Redirect to the homepage
+        else:
+            messages.error(request, 'Passwords do not match')
+            return render(request, 'registration/register.html')
+    return render(request, 'registration/register.html')
 
 #---HOME-PAGE---#
 def index(request):
@@ -103,6 +135,7 @@ def search_authors(request):
 
 
 #---ADD-A-BOOK-TO-CART---#
+@login_required
 def add_to_cart(request, book_id):
     book = get_object_or_404(Book, id=book_id) # get the book from the Book db using id
     quantity = request.POST.get('quantity') # get the quantity asked for
@@ -116,7 +149,7 @@ def add_to_cart(request, book_id):
         return redirect(request.META.get('HTTP_REFERER', 'search'))
 
     # if book already present in cart get its instance else create a new instance
-    cart, created = Cart.objects.get_or_create(book=book,defaults={'quantity': quantity})
+    cart, created = Cart.objects.get_or_create(user=request.user,book=book,defaults={'quantity': quantity})
     
     if created:
         cart.quantity = quantity
@@ -133,32 +166,53 @@ def add_to_cart(request, book_id):
     return redirect(request.META.get('HTTP_REFERER', 'search'))
 
 #---CART-PAGE---#
+@login_required
 def cart(request):
-    cart = Cart.objects.all()
-    total_price=0
-    for cart_item in cart: # find the total price of the cart
-        total_price+=cart_item.book.price * cart_item.quantity
-    # render the cart.html page with the total_price 
-    return render(request, 'cart.html', {'cart': cart, 'total_price': total_price})
+    carts = Cart.objects.filter(user=request.user)
+
+    total_price = sum(cart.book.price * cart.quantity for cart in carts)
+
+    context = {
+        'cart': carts,
+        'total_price': total_price
+    }
+
+    return render(request, 'cart.html', context)
+
 
 #---REMOVE-BOOK-FROM-CART---#
-def remove_from_cart(request, book_id):
-    # Get the cart item associated with the book_id
-    cart_item = get_object_or_404(Cart, id=book_id)
-    # Delete the cart item
-    cart_item.delete()
-    # Redirect the user to the cart page
+@login_required
+def remove_from_cart(request, cart_id):
+    cart = get_object_or_404(Cart, id=cart_id, user=request.user)
+    book = cart.book
+
+    cart.delete()
+
+    messages.success(request, f"{book.title} removed from your cart.")
     return redirect('cart')
 
 #---CLEAR-THE-ENTIRE-CART---#
-def clear_cart(request):
-    Cart.objects.all().delete()
-    return redirect('search')
+@login_required
+def clear_cart_logout(request):
+    user = request.user
+    if not user.is_superuser:
+        Cart.objects.filter(user=user).delete()
+        user.delete()
+    else:
+        Cart.objects.filter(user=user).delete()
+    logout(request)
+    return redirect('home')
+
+def start_shopping(request):
+    logout(request)
+    return redirect('home')
 
 #---REQUEST-FOR-A-NEW-BOOK---#
+@login_required
 def procure(request):
     return render(request,'procurement.html')
 
+@login_required
 def send_procure_request(request):
     if request.method == 'POST':
         # Get data from the request
@@ -192,10 +246,12 @@ def send_procure_request(request):
 
 
 #---MAKE-BILL-AND-REDUCE-INVENTORY---#
+@login_required
 def proceed_to_buy(request):
+    cart = Cart.objects.filter(user=request.user)
     if request.method =='POST': # get the name of buyer, email and phone number from the form
 
-        if not Cart.objects.exists():
+        if not cart.exists():
             messages.error(request, "Your cart is empty or Transaction is over...")
             return redirect('cart')
 
@@ -203,8 +259,7 @@ def proceed_to_buy(request):
         email = request.POST.get('email')
         phone = request.POST.get('phone')
 
-        cart_items = Cart.objects.all()
-        for cart_item in cart_items:
+        for cart_item in cart:
             book = cart_item.book
             inventory = Inventory.objects.get(book=book)
             # if inventory stock is greater than or equal to asked quantity reduce the inventory
@@ -217,13 +272,13 @@ def proceed_to_buy(request):
                 return redirect('cart')
         
         # find the total price
-        total_price = sum(cart_item.book.price * cart_item.quantity for cart_item in cart_items)
+        total_price = sum(cart_item.book.price * cart_item.quantity for cart_item in cart)
         # fill the bill content
         bill_email="\n"
         bill_date= timezone.now().date()
         bill_time= timezone.now().time()
 
-        for cart_item in cart_items:
+        for cart_item in cart:
             bill_email+=f"{cart_item.book.title} X {cart_item.quantity} - ₹{cart_item.book.price * cart_item.quantity}\n"  #inside loop
             sales= Sales.objects.create(date=timezone.now(),book=cart_item.book,quantity=cart_item.quantity,revenue=cart_item.book.price * cart_item.quantity,buyer_name=name)
             sales.save()
@@ -236,17 +291,16 @@ def proceed_to_buy(request):
         recipient_list = [email, ]
         send_mail( subject, message, email_from, recipient_list )
 
-        # delete the cart
-        Cart.objects.all().delete()
-
         context = {
             'bill_content': bill_email,
             'bill_date': bill_date,
             'bill_time': bill_time,
             'buyer_name': name,
-            'cart_items': cart_items,
+            'cart_items': cart,
             'total_price': total_price
         }
+         # delete the cart
+        cart.delete()
         return render(request, 'bill.html', context)
     else:
         return redirect('cart')
@@ -257,6 +311,7 @@ def book_details(request,book_id):
     return render(request, 'book_details.html',{'book':book})
 
 #---REQUEST-BOOK-IF-STOCK-OUT---#
+@login_required
 def request_book(request, book_id):
     book = get_object_or_404(Book, id=book_id)
 

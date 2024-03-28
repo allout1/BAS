@@ -17,6 +17,7 @@ Cart
                     <th>Price</th>
                     <th>Rack_number</th>
                     <th>Quantity</th>
+                    <th>Total Price</th>
                     <th>Remove</th>
                 </tr>
             </thead>
@@ -28,6 +29,7 @@ Cart
                         <td>{{ item.book.price }}</td>
                         <td>{{ item.book.inventory.rack_number}}</td>
                         <td>{{ item.quantity }}</td>
+                        <td>{{ item.revenue }}</td>
                         <td>
                             <form method="post" action="{% url 'remove_from_cart' item.id %}">
                                 {% csrf_token %}

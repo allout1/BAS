@@ -13,7 +13,7 @@ Bookstore
     <div class="text-center">
     <form method="GET" action="{% url 'search' %}" style="max-width:60%; margin-left:20%;">
         <div>
-            <label><p style="font-size:20px"><input type="radio" name="search_type" value="title"  required > Search by Title</p></label>
+            <label><p style="font-size:20px"><input type="radio" name="search_type" value="title" checked required > Search by Title</p></label>
             <label><p style="font-size:20px"><input type="radio" name="search_type" value="author" class="ml-5" required> Search by Author </p></label>
         </div>
         <div class="input-group mb-3">
@@ -53,7 +53,7 @@ Bookstore
                                         <p class="card-text" style="color:blue; font-size:15px;">Only {{ book.inventory.stock }} left</p>
                                     {% endif %}
 
-                                    <a href="{% url 'book_details' book.id %}" class="btn btn-primary" target="_blank">Details</a>
+                                    <a href="{% url 'book_details' book.id %}" class="btn btn-primary">Details</a>
                                 </div>
                             </div>
                         </div>
@@ -99,7 +99,7 @@ Bookstore
                                 <p class="card-text" style="color:blue; font-size:15px;">Only {{ book.inventory.stock }} left</p>
                             {% endif %}
 
-                            <a href="{% url 'book_details' book.id %}" class="btn btn-primary" target="_blank">Details</a>
+                            <a href="{% url 'book_details' book.id %}" class="btn btn-primary">Details</a>
                         </div>
                     </div>
                 </div>

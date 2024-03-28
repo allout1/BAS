@@ -11,6 +11,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
+    <!-- Bootstrap Icons CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+
 
     <title>{% block title %}{% endblock %}</title>
 
@@ -23,38 +26,66 @@
         }
     </style>
   </head>
+
   <body>
     {% comment %} adding the navbar  {% endcomment %}
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 
-    {% comment %} move to home page {% endcomment %}
-    <a class="navbar-brand" href={% url 'home' %} style="font-size:200%; color:#FFDB58;">Bookshop</a> 
-    
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav">
-            {% comment %} link to search page  {% endcomment %}
-            <li class="nav-item active">
-                <a class="nav-link" href={% url 'search' %} style="font-size:150%">Search <span class="sr-only">(current)</span></a>
-            </li>
-            {% comment %} link to cart page  {% endcomment %}
-            <li class="nav-item active">
-                <a class="nav-link" href={% url 'cart' %} style="font-size:150%">Cart <span class="sr-only">(current)</span></a>
-            </li>
-            {% comment %} link to request page  {% endcomment %}
-            {% comment %} clear cart and start a new shopping {% endcomment %}
-            <li class="text-right">
-                <form action="{% url 'clear_cart' %}" method="post">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-light custom-button" style="margin-left:600%; margin-top:5px;">Start Shopping</button>
-                </form>
-            </li>
-            <!-- Add other links here -->
-        </ul>
-    </div>
+        {% comment %} move to home page {% endcomment %}
+        <a class="navbar-brand" href={% url 'home' %} style="font-size:200%; color:#FFDB58;">Bookshop</a> 
+        
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                {% comment %} link to search page  {% endcomment %}
+                <span class="nav-link d-flex align-items-center">|</span>
+                <li class="nav-item active">
+                    <a class="nav-link" href={% url 'search' %} style="font-size:120%"><i class="fas fa-search"></i>  Search <span class="sr-only">(current)</span></a>
+                </li>
+                <span class="nav-link d-flex align-items-center">|</span>
+                {% comment %} link to cart page  {% endcomment %}
+                <li class="nav-item active">
+                    <a class="nav-link" href={% url 'cart' %} style="font-size:120%"><i class="fas fa-shopping-cart"></i>  Cart <span class="sr-only">(current)</span></a>
+                </li>
+                <span class="nav-link d-flex align-items-center">|</span>
+            </ul>
+        </div>
+
+        <!-- Move these items to the right -->
+        <div class="ml-auto">
+            <ul class="navbar-nav">
+                {% if user.is_authenticated %}
+                    <span class="nav-link d-flex align-items-center">|</span>
+                    <li class="nav-item d-flex align-items-center">
+                        <span style="font-size:120%; color:white;">
+                                Hello, {{ user.username }}
+                        </span>
+                    </li>
+                {% endif %}
+                <span class="nav-link d-flex align-items-center">|</span>
+                <li class="nav-item active">
+                    {% if user.is_authenticated %}
+                        <a class="nav-link" href="{% url 'logout' %}" style="font-size:120%; color:aqua;">Logout</a>
+                    {% else %}
+                        <a class="nav-link" href="{% url 'login' %}" style="font-size:120%; color:aqua;">Login</a>
+                    {% endif %}
+                </li>
+                
+                {% comment %} link to request page  {% endcomment %}
+                {% comment %} clear cart and start a new shopping {% endcomment %}
+                <div class="d-flex">
+                    <form action="{% url 'start_shopping' %}" method="post" class="d-flex">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-light custom-button" style="margin-left:15px; margin-top:5px;">Start Shopping</button>
+                    </form>
+                </div>
+                <!-- Add other links here -->
+            </ul>
+        </div>
     </nav>
+
 
     {% comment %} show the messages below nav bar  {% endcomment %}
     {% if messages %}
