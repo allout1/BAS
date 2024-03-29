@@ -3,6 +3,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import User
 from django.contrib.auth.models import AbstractUser
+import datetime
 
 # class CustomUser(AbstractUser):
 #     # Add any additional fields here
@@ -55,7 +56,7 @@ class RequestBook(models.Model):
     requested_by = models.CharField(max_length=50)
     email= models.EmailField(default="")
     quantity= models.IntegerField(default=0)
-    date_of_request= models.DateTimeField()
+    date_of_request= models.DateTimeField(default=datetime.datetime.now)
 
     def __str__(self):
         return f"{self.book.title}-{self.requested_by}"
@@ -88,7 +89,7 @@ class Cart(models.Model):
 
 
 class Sales(models.Model):
-    date= models.DateTimeField()
+    date= models.DateTimeField(default=datetime.datetime.now)
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     revenue= models.DecimalField(max_digits=10,decimal_places=2)
     quantity=models.IntegerField(default=0)

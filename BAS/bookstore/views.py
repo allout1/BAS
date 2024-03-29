@@ -12,6 +12,7 @@ import re
 import random
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+import datetime
 # from django.contrib.admin.views.decorators import staff_member_required
 # from django.core.exceptions import ObjectDoesNotExist
 
@@ -20,31 +21,26 @@ from django.contrib.auth.models import User
 def login_view(request):
     if request.method == 'POST':
         email = request.POST['email']
-        password = request.POST['password']
-        user = authenticate(request, email=email, password=password)
+        # password = request.POST['password']
+        user = authenticate(request, email=email)
         if user is not None:
             login(request, user)
             return redirect('search')  # Redirect to the homepage
-        messages.error(request, 'Email or password is incorrect')    
+        else:
+            messages.error(request, 'Email not present')    
     return render(request, 'registration/login.html')
 
 def register_view(request):
     if request.method == 'POST':
         username = request.POST['username']
         email = request.POST['email']
-        password1 = request.POST['password1']
-        password2 = request.POST['password2']
-        if password1 == password2:
-            if User.objects.filter(Q(email=email) | Q(username=username)).exists():
-                messages.error(request, 'Username or email is already taken')
-                return render(request, 'registration/register.html')
-            else:
-                user = User.objects.create_user(username=username, email=email, password=password1)
-                login(request, user)
-                return redirect('search')  # Redirect to the homepage
-        else:
-            messages.error(request, 'Passwords do not match')
+        if User.objects.filter(Q(email=email) | Q(username=username)).exists():
+            messages.error(request, 'Username or email is already taken')
             return render(request, 'registration/register.html')
+        else:
+            user = User.objects.create_user(username=username, email=email)
+            login(request, user)
+            return redirect('search')  # Redirect to the homepage
     return render(request, 'registration/register.html')
 
 #---HOME-PAGE---#
@@ -192,16 +188,16 @@ def remove_from_cart(request, cart_id):
     return redirect('cart')
 
 #---CLEAR-THE-ENTIRE-CART---#
-@login_required
-def clear_cart_logout(request):
-    user = request.user
-    if not user.is_superuser:
-        Cart.objects.filter(user=user).delete()
-        user.delete()
-    else:
-        Cart.objects.filter(user=user).delete()
-    logout(request)
-    return redirect('home')
+# @login_required
+# def clear_cart_logout(request):
+#     user = request.user
+#     if not user.is_superuser:
+#         Cart.objects.filter(user=user).delete()
+#         user.delete()
+#     else:
+#         Cart.objects.filter(user=user).delete()
+#     logout(request)
+#     return redirect('home')
 
 def start_shopping(request):
     logout(request)
@@ -280,13 +276,13 @@ def proceed_to_buy(request):
         total_price = sum(cart_item.book.price * cart_item.quantity for cart_item in cart)
         # fill the bill content
         bill_email="\n"
-        bill_date= timezone.localtime(timezone.now()).date()
-        bill_time= timezone.localtime(timezone.now()).time()
+        bill_date= datetime.date.today()
+        bill_time= datetime.datetime.now().time()
         print(bill_time)
 
         for cart_item in cart:
             bill_email+=f"{cart_item.book.title} X {cart_item.quantity} - ₹{cart_item.book.price * cart_item.quantity}\n"  #inside loop
-            sales= Sales.objects.create(date=timezone.localtime(timezone.now()),book=cart_item.book,quantity=cart_item.quantity,revenue=cart_item.book.price * cart_item.quantity,buyer_name=name)
+            sales= Sales.objects.create(book=cart_item.book,quantity=cart_item.quantity,revenue=cart_item.book.price * cart_item.quantity,buyer_name=name)
             sales.save()
         bill_email+=f"\nTotal: ₹{total_price}"# just outside loop
 
@@ -307,6 +303,7 @@ def proceed_to_buy(request):
         }
          # delete the cart
         Cart.objects.filter(user=request.user).delete()
+        clear_cart_logout(request)
         return render(request, 'bill.html', context)
     else:
         return redirect('cart')

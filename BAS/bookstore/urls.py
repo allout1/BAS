@@ -17,8 +17,6 @@ urlpatterns = [
     path("cart/", views.cart, name="cart"), 
     # remove a book from cart
     path("remove_from_cart/<int:cart_id>/", views.remove_from_cart, name="remove_from_cart"),
-    # empty the cart
-    path('clear-cart/', views.clear_cart_logout, name='clear_cart_logout'),
     # procure a new book page
     path('procure/',views.procure,name='procure'),
     # send procurement request
