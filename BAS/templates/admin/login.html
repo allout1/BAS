@@ -1,0 +1,28 @@
+{% extends "admin/login.html" %}
+
+{% block extrahead %}
+{{ block.super }}
+
+<style>
+  /* Add your custom CSS styles here */
+  .extra-button {
+    margin-top: 10px;
+    margin-left:41%;
+    font-size:20px; 
+    width:20%;
+    background-color:#2596be;
+    color:white;
+  }
+  
+</style>
+{% endblock %}
+
+{% block content %}
+{{ block.super }}
+<div class="container-fluid">
+<form method="post" action="{% url 'home'%}">
+  {% csrf_token %}
+<button type="submit" class="extra-button">Home</button>
+</form>
+</div>
+{% endblock %}
