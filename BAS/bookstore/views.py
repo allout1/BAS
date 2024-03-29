@@ -27,7 +27,8 @@ def login_view(request):
             login(request, user)
             return redirect('search')  # Redirect to the homepage
         else:
-            messages.error(request, 'Email not present')    
+            messages.error(request, 'Email not present')
+            return render(request, 'registration/login.html')   
     return render(request, 'registration/login.html')
 
 def register_view(request):
