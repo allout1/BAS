@@ -102,7 +102,8 @@ class ThresholdFIlter(admin.SimpleListFilter):
     def queryset(self,request,queryset):
         if self.value()=="threshold":
             # Calculate the date range for the last two weeks
-            two_weeks_ago = timezone.now() - timedelta(days=14)
+            two_weeks_ago = timezone.localtime(timezone.now()) - timedelta(days=14)
+            print(timezone.localtime(timezone.now()))
 
             # Query to get the count of books sold in the last two weeks
             books_sold = Sales.objects.filter(

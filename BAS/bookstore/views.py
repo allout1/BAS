@@ -35,8 +35,8 @@ def register_view(request):
         password1 = request.POST['password1']
         password2 = request.POST['password2']
         if password1 == password2:
-            if User.objects.filter(email=email).exists():
-                messages.error(request, 'Username is already taken')
+            if User.objects.filter(Q(email=email) | Q(username=username)).exists():
+                messages.error(request, 'Username or email is already taken')
                 return render(request, 'registration/register.html')
             else:
                 user = User.objects.create_user(username=username, email=email, password=password1)
@@ -280,12 +280,13 @@ def proceed_to_buy(request):
         total_price = sum(cart_item.book.price * cart_item.quantity for cart_item in cart)
         # fill the bill content
         bill_email="\n"
-        bill_date= timezone.now().date()
-        bill_time= timezone.now().time()
+        bill_date= timezone.localtime(timezone.now()).date()
+        bill_time= timezone.localtime(timezone.now()).time()
+        print(bill_time)
 
         for cart_item in cart:
             bill_email+=f"{cart_item.book.title} X {cart_item.quantity} - ₹{cart_item.book.price * cart_item.quantity}\n"  #inside loop
-            sales= Sales.objects.create(date=timezone.now(),book=cart_item.book,quantity=cart_item.quantity,revenue=cart_item.book.price * cart_item.quantity,buyer_name=name)
+            sales= Sales.objects.create(date=timezone.localtime(timezone.now()),book=cart_item.book,quantity=cart_item.quantity,revenue=cart_item.book.price * cart_item.quantity,buyer_name=name)
             sales.save()
         bill_email+=f"\nTotal: ₹{total_price}"# just outside loop
 
@@ -336,7 +337,7 @@ def request_book(request, book_id):
         else:
             # If the requested quantity exceeds the stock, create a request
             messages.success(request, f"Request sent for {book.title}")
-            RequestBook.objects.create(date_of_request=timezone.now(),book=book, requested_by=requested_by, email=email, quantity=quantity).save()
+            RequestBook.objects.create(date_of_request=timezone.localtime(timezone.now()),book=book, requested_by=requested_by, email=email, quantity=quantity).save()
 
     # Redirect back to the book detail page
     return redirect(request.META.get('HTTP_REFERER', 'book_details'))

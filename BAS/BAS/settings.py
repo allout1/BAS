@@ -104,8 +104,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 AUTHENTICATION_BACKENDS = [
-    'bookstore.backends.EmailAuthenticationBackend',
-    'django.contrib.auth.backends.ModelBackend',  # Keep the default ModelBackend as well
+    'bookstore.backends.EmailOrUsernameAuthenticationBackend',
 ]
 
 
