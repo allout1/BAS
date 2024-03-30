@@ -155,13 +155,13 @@ def add_to_cart(request, book_id):
         cart.revenue = quantity*book.price
     else:
         if(cart.quantity+quantity>book.inventory.stock):
-            messages.error(request, f"Less stock for {book.title}")
+            messages.error(request, f"Less stock for '{book.title}'")
             return redirect('/book_details/'+str(book_id))
         cart.quantity += quantity
         cart.revenue += quantity*book.price
     cart.save() # save the book with quantity in the Cart
     # give a success message that the book is added to the cart and redirect to the previous page
-    messages.success(request, f"{book.title} added to cart.")
+    messages.success(request, f'"{book.title}" added to cart.')
     return redirect('/book_details/'+str(book_id))
 
 #---CART-PAGE---#
@@ -182,7 +182,7 @@ def remove_from_cart(request, cart_id):
     cart = get_object_or_404(Cart, id=cart_id, user=request.user)
     book = cart.book
     cart.delete()
-    messages.success(request, f"{book.title} removed from your cart.")
+    messages.success(request, f'"{book.title}" removed from your cart.')
     return redirect('cart')
 
 #---OPEN-BOOK_DETAILS-PAGE---#
@@ -210,7 +210,7 @@ def request_book(request, book_id):
             pass
         else:
             # If the requested quantity exceeds the stock, create a request
-            messages.success(request, f"Request sent for {book.title}")
+            messages.success(request, f'Request sent for "{book.title}"')
             RequestBook.objects.create(date_of_request=timezone.localtime(timezone.now()),book=book, requested_by=requested_by, email=email, quantity=quantity).save()
 
     # Redirect back to the book detail page
@@ -298,14 +298,14 @@ def proceed_to_buy(request):
         print(bill_time)
 
         for cart_item in cart:
-            bill_email+=f"{cart_item.book.title} X {cart_item.quantity} - ₹{cart_item.book.price * cart_item.quantity}\n"  #inside loop
+            bill_email+=f"{cart_item.book.title} X {cart_item.quantity} - MRP:₹{cart_item.book.price} TOTAL:₹{cart_item.book.price * cart_item.quantity}\n"  #inside loop
             sales= Sales.objects.create(book=cart_item.book,quantity=cart_item.quantity,revenue=cart_item.book.price * cart_item.quantity,buyer_name=name)
             sales.save()
         bill_email+=f"\nTotal: ₹{total_price}"# just outside loop
 
         #email sending procedure
         subject = 'Bill for your purchase'
-        message = f'Hi {name}, thank you for buying.\nYour purchase is:\n{bill_email}\n\n Visit us Again'
+        message = f'Hi {name}, Thank you for buying.\n\nYour purchase is:\n{bill_email}\n\nVisit us Again'
         email_from = settings.EMAIL_HOST_USER
         recipient_list = [email, ]
         send_mail( subject, message, email_from, recipient_list )
