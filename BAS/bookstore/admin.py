@@ -47,7 +47,6 @@ class SalesAdmin(admin.ModelAdmin):
     def changelist_view(self, request, extra_context=None):
         response = super().changelist_view(request, extra_context=extra_context)
         queryset = response.context_data['cl'].queryset
-        print(queryset)
         total_revenue = queryset.aggregate(total_revenue=Sum('revenue'))['total_revenue']
         graph_data= self.revenue_graph(queryset)
         response.context_data['total_revenue'] = total_revenue if total_revenue is not None else 0
@@ -103,7 +102,6 @@ class ThresholdFIlter(admin.SimpleListFilter):
         if self.value()=="threshold":
             # Calculate the date range for the last two weeks
             two_weeks_ago = timezone.localtime(timezone.now()) - timedelta(days=14)
-            print(timezone.localtime(timezone.now()))
 
             # Query to get the count of books sold in the last two weeks
             books_sold = Sales.objects.filter(

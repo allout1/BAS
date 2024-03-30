@@ -13,35 +13,37 @@ import random
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 import datetime
-# from django.contrib.admin.views.decorators import staff_member_required
-# from django.core.exceptions import ObjectDoesNotExist
 
-# Create your views here.
-
+#---USER-LOGIN---#
 def login_view(request):
     if request.method == 'POST':
-        email = request.POST['email']
-        # password = request.POST['password']
-        user = authenticate(request, email=email)
+        email = request.POST['email'] # take the email from form
+        user = authenticate(request, email=email) # authenticate whether that user is present or not
         if user is not None:
             login(request, user)
-            return redirect('search')  # Redirect to the homepage
+            try:
+                next_url = request.GET.get('next','=')  # Get the 'next' parameter from the request
+                if next_url:
+                    return redirect(next_url)  # Redirect to the URL specified in 'next'
+            except:
+                return redirect('search')  # Redirect to the homepage if 'next' is not specified
         else:
-            messages.error(request, 'Email not present')
-            return render(request, 'registration/login.html')   
+            messages.error(request, 'Email not present ! Register')
+            return redirect('register')  # if user not present redirect to registration page
     return render(request, 'registration/login.html')
 
+#---REGISTER-A-NEW-USER---#
 def register_view(request):
     if request.method == 'POST':
-        username = request.POST['username']
+        username = request.POST['username'] # get username and email
         email = request.POST['email']
-        if User.objects.filter(Q(email=email) | Q(username=username)).exists():
+        if User.objects.filter(Q(email=email) | Q(username=username)).exists(): # if that user already exists
             messages.error(request, 'Username or email is already taken')
             return render(request, 'registration/register.html')
         else:
-            user = User.objects.create_user(username=username, email=email)
+            user = User.objects.create_user(username=username, email=email) # else create a new user and login 
             login(request, user)
-            return redirect('search')  # Redirect to the homepage
+            return redirect('search')  # Redirect to the homepage if 'next' is not specified
     return render(request, 'registration/register.html')
 
 #---HOME-PAGE---#
@@ -138,12 +140,12 @@ def add_to_cart(request, book_id):
     quantity = request.POST.get('quantity') # get the quantity asked for
     if not quantity:
         messages.error(request, "Please enter a quantity.") # if no quantity is entered return to the previous searched page
-        return redirect(request.META.get('HTTP_REFERER', 'search'))
+        return redirect('/book_details/'+str(book_id))
     try:
         quantity = int(quantity)
     except ValueError: # if entered quantity is not a valid integer give error and return to previous page
         messages.error(request, "Invalid quantity.")
-        return redirect(request.META.get('HTTP_REFERER', 'search'))
+        return redirect('/book_details/'+str(book_id))
 
     # if book already present in cart get its instance else create a new instance
     cart, created = Cart.objects.get_or_create(user=request.user,book=book,defaults={'quantity': quantity})
@@ -154,26 +156,23 @@ def add_to_cart(request, book_id):
     else:
         if(cart.quantity+quantity>book.inventory.stock):
             messages.error(request, f"Less stock for {book.title}")
-            return redirect(request.META.get('HTTP_REFERER', 'search'))
+            return redirect('/book_details/'+str(book_id))
         cart.quantity += quantity
         cart.revenue += quantity*book.price
     cart.save() # save the book with quantity in the Cart
     # give a success message that the book is added to the cart and redirect to the previous page
     messages.success(request, f"{book.title} added to cart.")
-    return redirect(request.META.get('HTTP_REFERER', 'search'))
+    return redirect('/book_details/'+str(book_id))
 
 #---CART-PAGE---#
 @login_required
 def cart(request):
     carts = Cart.objects.filter(user=request.user)
-
     total_price = sum(cart.book.price * cart.quantity for cart in carts)
-
     context = {
         'cart': carts,
         'total_price': total_price
     }
-
     return render(request, 'cart.html', context)
 
 
@@ -182,33 +181,42 @@ def cart(request):
 def remove_from_cart(request, cart_id):
     cart = get_object_or_404(Cart, id=cart_id, user=request.user)
     book = cart.book
-
     cart.delete()
-
     messages.success(request, f"{book.title} removed from your cart.")
     return redirect('cart')
 
-#---CLEAR-THE-ENTIRE-CART---#
-# @login_required
-# def clear_cart_logout(request):
-#     user = request.user
-#     if not user.is_superuser:
-#         Cart.objects.filter(user=user).delete()
-#         user.delete()
-#     else:
-#         Cart.objects.filter(user=user).delete()
-#     logout(request)
-#     return redirect('home')
+#---OPEN-BOOK_DETAILS-PAGE---#
+def book_details(request,book_id):
+    book = get_object_or_404(Book, id=book_id)
+    return render(request, 'book_details.html',{'book':book})
 
-def start_shopping(request):
-    logout(request)
-    return redirect('home')
+#---REQUEST-BOOK-IF-STOCK-OUT---#
+@login_required
+def request_book(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+
+    if request.method == 'POST':
+        requested_by = request.user.username
+        email = request.user.email
+        quantity = int(request.POST.get('quantity'))
+
+        if quantity <= 0:
+            messages.error(request, 'Invalid quantity. Please enter a positive number.')
+            return redirect('/book_details/'+str(book_id))
+
+        if quantity <= book.inventory.stock:
+            messages.error(request, f"The quantity of {quantity} can be bought with the existing stock !")
+            # If the requested quantity is available in stock, handle as a regular purchase
+            pass
+        else:
+            # If the requested quantity exceeds the stock, create a request
+            messages.success(request, f"Request sent for {book.title}")
+            RequestBook.objects.create(date_of_request=timezone.localtime(timezone.now()),book=book, requested_by=requested_by, email=email, quantity=quantity).save()
+
+    # Redirect back to the book detail page
+    return redirect('/book_details/'+str(book_id))
 
 #---REQUEST-FOR-A-NEW-BOOK---#
-@login_required
-def procure(request):
-    return render(request,'procurement.html')
-
 @login_required
 def send_procure_request(request):
     if request.method == 'POST':
@@ -257,6 +265,14 @@ def proceed_to_buy(request):
         if confirmation_checked != 'on':
             messages.error(request, "Please confirm your purchase by checking the checkbox.")
             return redirect('cart')
+        
+        # Get the entered email
+        buyer_email = request.POST.get('buyer_email')
+
+        # Ensure the entered email matches the user's email
+        if buyer_email != request.user.email:
+            messages.error(request, "Please enter your registered email address.")
+            return redirect('cart')
 
         name = request.user.username
         email = request.user.email
@@ -304,69 +320,39 @@ def proceed_to_buy(request):
         }
          # delete the cart
         Cart.objects.filter(user=request.user).delete()
-        clear_cart_logout(request)
+        user = request.user
+        if not user.is_superuser:
+            Cart.objects.filter(user=user).delete()
+            user.delete()
+        logout(request)
         return render(request, 'bill.html', context)
     else:
         return redirect('cart')
 
-#---OPEN-BOOK_DETAILS-PAGE---#
-def book_details(request,book_id):
-    book = get_object_or_404(Book, id=book_id)
-    return render(request, 'book_details.html',{'book':book})
+#---When-START-SHOPPING-button-is-clicked---#
+def start_shopping(request):
+    logout(request)
+    return redirect('home')
 
-#---REQUEST-BOOK-IF-STOCK-OUT---#
-@login_required
-def request_book(request, book_id):
-    book = get_object_or_404(Book, id=book_id)
+#---Send-EMAIL---#
+def send_email(request):
+    cart = Cart.objects.filter(user=request.user)
+    if cart.exists():
+        name=request.user.username
+        email=request.user.email
 
-    if request.method == 'POST':
-        requested_by = request.user.username
-        email = request.user.email
-        quantity = int(request.POST.get('quantity'))
+        email_str="\n"
+        for cart_item in cart:
+            email_str+= f"{cart_item.book.title} X {cart_item.quantity} - Rack no: {cart_item.book.inventory.rack_number}\n"
 
-        if quantity <= 0:
-            return render(request, 'your_template.html', {'error_message': 'Invalid quantity. Please enter a positive number.'})
+        # Email sending procedure
+        subject = 'Your Wishlist'
+        message = f'Hi {name}, This is your wishlist... You can now move to the racks for collecting your book\n{email_str}\nAfter collecting the books go to the machine and click proceed to buy'
+        email_from = settings.EMAIL_HOST_USER
+        recipient_list = [email]
+        send_mail(subject, message, email_from, recipient_list)
 
-        if quantity <= book.inventory.stock:
-            messages.error(request, f"The quantity of {quantity} can be bought with the existing stock !")
-            # If the requested quantity is available in stock, handle as a regular purchase
-            # You may want to add your purchase logic here
-            pass
-        else:
-            # If the requested quantity exceeds the stock, create a request
-            messages.success(request, f"Request sent for {book.title}")
-            RequestBook.objects.create(date_of_request=timezone.localtime(timezone.now()),book=book, requested_by=requested_by, email=email, quantity=quantity).save()
-
-    # Redirect back to the book detail page
-    return redirect(request.META.get('HTTP_REFERER', 'book_details'))
-
-# @staff_member_required
-# def book_threshold_page(request):
-#     # Calculate the date range for the last two weeks
-#     two_weeks_ago = timezone.now() - timedelta(days=14)
+        messages.success(request, "Wishlist sent successfully!")
     
-#     # Retrieve all books and calculate their threshold
-#     books = Book.objects.all()
-#     books_below_threshold = []
+    return redirect('cart')
 
-#     for book in books:
-#         # vendor_list= Vendor_list.objects.get(book=book)
-#         # Count the number of sales for the book in the last two weeks
-#         sales_count = Sales.objects.filter(book=book, date__gte=two_weeks_ago).count()
-#         # Calculate the threshold for the book
-#         threshold = 20 + sales_count
-
-#         try:
-#         # Access the related Vendor_list
-#             vendor_list = book.vendor_list  # This will return the related Vendor_list instance
-#         except ObjectDoesNotExist:
-#             # Handle the case where the related Vendor_list does not exist
-#             Vendor_list.objects.create(book=book)  # or take appropriate action based on your application logic
-#             vendor_list= book.vendor_list
-
-#         vendor_list.threshold=threshold
-#         # If the quantity is less than the threshold, add the book to the list
-#         if book.inventory.stock < threshold:
-#             books_below_threshold.append(book)
-
-#     return render(request, 'book_threshold.html', {'books_below_threshold': books_below_threshold})

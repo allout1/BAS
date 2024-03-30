@@ -75,7 +75,7 @@ class ProcureBook(models.Model):
         return f"{self.book_title}-{self.user_name}"
 
 class Cart(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE,default="")
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     quantity = models.IntegerField()
     revenue= models.DecimalField(max_digits=8, decimal_places=2,default=0)
