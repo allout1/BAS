@@ -330,9 +330,13 @@ def proceed_to_buy(request):
         return redirect('cart')
 
 #---When-START-SHOPPING-button-is-clicked---#
-def start_shopping(request):
+def logout_index(request):
     logout(request)
     return redirect('home')
+
+def start_shopping(request):
+    logout(request)
+    return redirect('search')
 
 #---Send-EMAIL---#
 def send_email(request):

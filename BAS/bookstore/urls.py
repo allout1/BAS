@@ -30,4 +30,5 @@ urlpatterns = [
     path('start_shopping/',views.start_shopping,name='start_shopping'),  
     # send the wishlist
     path('send_email',views.send_email,name='send_email'),
+    path('logout_index',views.logout_index,name='logout_index'),
 ]

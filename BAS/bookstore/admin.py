@@ -59,16 +59,17 @@ class SalesAdmin(admin.ModelAdmin):
         # Aggregate revenues for each date
         for sale in queryset:
             date = sale.date.date()  # Extract date portion
-            if date in date_revenues:
-                date_revenues[date] += sale.revenue
+            date_local= date+timedelta(hours=5,minutes=30)
+            if date_local in date_revenues:
+                date_revenues[date_local] += sale.revenue
             else:
-                date_revenues[date] = sale.revenue
+                date_revenues[date_local] = sale.revenue
 
         dates = list(date_revenues.keys())
         revenues = list(date_revenues.values())
 
-        plt.figure(figsize=(6.5, 6))
-        plt.plot(dates, revenues)
+        plt.figure(figsize=(6, 4))  # Adjust the figure size as needed
+        plt.bar(dates, revenues, color='skyblue')  # Create a bar plot
         plt.title('TOTAL REVENUE v/s DATE')
         plt.xlabel('DATE')
         plt.ylabel('TOTAL REVENUE (in ₹)')
