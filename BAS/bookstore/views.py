@@ -28,7 +28,7 @@ def login_view(request):
             except:
                 return redirect('search')  # Redirect to the homepage if 'next' is not specified
         else:
-            messages.error(request, 'Email not present ! Register')
+            messages.error(request, 'Email not present ! Please Register')
             return redirect('register')  # if user not present redirect to registration page
     return render(request, 'registration/login.html')
 
@@ -38,7 +38,7 @@ def register_view(request):
         username = request.POST['username'] # get username and email
         email = request.POST['email']
         if User.objects.filter(Q(email=email) | Q(username=username)).exists(): # if that user already exists
-            messages.error(request, 'Username or email is already taken')
+            messages.error(request, 'Username or email already exists')
             return render(request, 'registration/register.html')
         else:
             user = User.objects.create_user(username=username, email=email) # else create a new user and login 
@@ -56,6 +56,34 @@ def logout_view(request):
   response = redirect('home') # redirect to the index.html page
   response.delete_cookie('example_cookie') # delete  the cookie named example_cookie
   return response
+
+#---SEARCH-BOOKS---#
+def cleaner(query):
+    metacharacters = [
+        "^",  # Matches the beginning of the string
+        "$",  # Matches the end of the string
+        ".",  # Matches any single character (except newline by default)
+        "*",  # Matches zero or more repetitions of the preceding character
+        "+",  # Matches one or more repetitions of the preceding character
+        "?",  # Matches zero or one occurrence of the preceding character
+        "|",  # Alternation (either or)
+        "[",  # Character class (start of a set of characters)
+        "]",  # Character class (end of a set of characters)
+        "\\",  # Escape character (to use a metacharacter literally)
+        "{",  # Quantifier (start of a repetition specification)
+        "}",  # Quantifier (end of a repetition specification)
+        "(",  # Capturing group (start)
+        ")",  # Capturing group (end)
+        "^",  # Inside character class for negation (e.g., [^a-z])
+        "-",  # Inside character class for range (e.g., [a-z])
+    ]
+    query1 = ""
+    for i in query:
+        if i in metacharacters:
+            query1 += '['+i+']'
+        else:
+            query1 += i
+    return query1
 
 #---SEARCH-BOOKS---#
 def search(request):
@@ -83,7 +111,7 @@ def search(request):
 
 #---SEARCH-TITLE---#
 def search_books(request):
-    query = str(request.GET.get('query')) # get query from the form
+    query = cleaner(str(request.GET.get('query'))) # get query from the form)
     query = query.replace(' ','')
     query = query.lower()
     if query: # search for the book either by author name or title in the books table of db
@@ -92,8 +120,14 @@ def search_books(request):
         books = {}
     y = "[.*,-:()' ]*"
     result = list()
-    for i in query:
-        y += (i+  "[.*,-:()' ]*")
+    i = 0
+    while(i< len(query)):
+        if(query[i]=='['):
+            y += query[i] + query[i+1] + query[i+2]
+            i = i + 3
+        else:
+            y += (query[i]+  "[.*,-:()' ]*")
+            i= i + 1
     for i in books:
         if(re.search(y,i.lower())):
             result.append(i)
@@ -108,7 +142,13 @@ def search_books(request):
 
 #---SEARCH-AUTHORS---#
 def search_authors(request):
-    query = str(request.GET.get('query')) # get query from the form
+    query = cleaner(str(request.GET.get('query'))) # get query from the form
+    query1 = query[::-1]
+    if(query1.find('.') != -1):
+        query1= query1[0:query1.find('.')]
+        query1 = query1[::-1]
+        if(len(query1) > 1):
+            query = query1
     query = query.replace('.',' ')
     query = query.replace(' ','')
     query = query.lower()
@@ -118,8 +158,14 @@ def search_authors(request):
         books = {}
     y = "[.*,-:()' ]*"
     result = list()
-    for i in query:
-        y += (i+  "[.*,-:()' ]*")
+    i = 0
+    while(i< len(query)):
+        if(query[i]=='['):
+            y += query[i] + query[i+1] + query[i+2]
+            i = i + 3
+        else:
+            y += (query[i]+  "[.*,-:()' ]*")
+            i= i + 1
     for i in books:
         if(re.search(y,i.lower())):
             result.append(i)
