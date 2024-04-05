@@ -1,6 +1,4 @@
 from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 from django.contrib.auth.models import User
 from django.contrib.auth.models import AbstractUser
 import datetime
@@ -23,14 +21,14 @@ class Book(models.Model):
     def __str__(self):
         return self.title
 
-@receiver(post_save, sender=Book)
-def create_inventory(sender, instance, created, **kwargs):
-    """
-    Create an Inventory record when a new Book instance is created.
-    """
-    if created:
-        Inventory.objects.create(book=instance, stock=0)
-        Vendor_list.objects.create(book=instance)
+    def save(self, *args, **kwargs):
+        if not self.pk:  # Check if this is a new book instance
+            super().save(*args, **kwargs)  # Save the book instance
+            # Create corresponding Inventory instance with zero stock
+            Inventory.objects.create(book=self, stock=0)
+            Vendor_list.objects.create(book=self)
+        else:
+            super().save(*args, **kwargs)  # For existing books, just save normally
 
 class Inventory(models.Model):
     book = models.OneToOneField(Book, on_delete=models.CASCADE)

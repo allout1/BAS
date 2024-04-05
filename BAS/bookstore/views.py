@@ -39,7 +39,7 @@ def register_view(request):
         email = request.POST['email']
         if User.objects.filter(Q(email=email) | Q(username=username)).exists(): # if that user already exists
             messages.error(request, 'Username or email already exists')
-            return render(request, 'registration/register.html')
+            # return render(request, 'registration/register.html')
         else:
             user = User.objects.create_user(username=username, email=email) # else create a new user and login 
             login(request, user)
