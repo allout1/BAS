@@ -62,7 +62,6 @@ def cleaner(query):
     metacharacters = [
         "^",  # Matches the beginning of the string
         "$",  # Matches the end of the string
-        ".",  # Matches any single character (except newline by default)
         "*",  # Matches zero or more repetitions of the preceding character
         "+",  # Matches one or more repetitions of the preceding character
         "?",  # Matches zero or one occurrence of the preceding character
@@ -244,7 +243,13 @@ def request_book(request, book_id):
     if request.method == 'POST':
         requested_by = request.user.username
         email = request.user.email
-        quantity = int(request.POST.get('quantity'))
+        quantity = request.POST.get('quantity')
+
+        try:
+            quantity = int(quantity)
+        except ValueError: # if entered quantity is not a valid integer give error and return to previous page
+            messages.error(request, "Quantity not entered.")
+            return redirect('/book_details/'+str(book_id))
 
         if quantity <= 0:
             messages.error(request, 'Invalid quantity. Please enter a positive number.')
