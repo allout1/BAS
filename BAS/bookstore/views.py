@@ -290,7 +290,7 @@ def send_procure_request(request):
         procure_book.save()
         messages.success(request, f"Request sent for {book_title} ")
         # Optionally, you can add a success message here
-        return redirect('procure')  # Redirect to a success page after form submission
+        return redirect('send_procure_request')  # Redirect to a success page after form submission
 
     # If the request method is not POST, render the procurement.html template
     return render(request, 'procurement.html')
