@@ -1,6 +1,10 @@
-from django.test import TestCase, Client
+from django.test import TestCase, Client, TransactionTestCase
 from django.urls import reverse
 from django.contrib.auth.models import User
+from django.contrib.messages import get_messages
+from django.contrib.messages.storage.fallback import FallbackStorage
+from bookstore.models import Book,Cart, Inventory
+from django.db import transaction
 
 class ModelTestCase(TestCase):
     def setUp(self):
@@ -30,3 +34,6 @@ class ModelTestCase(TestCase):
         response = self.client.post(self.register_url, {'username': 'existinguser', 'email': 'existinguser@example.com'})
         self.assertEqual(response.status_code, 200)  # Status code 200 indicates staying on the page
         self.assertContains(response, 'Username or email already exists')
+
+        print("User authentication working fine...")
+

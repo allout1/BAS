@@ -11,7 +11,7 @@ procure
     {% csrf_token %}
         <div class="col-md-5">
           <label for="inputphone" class="form-label">Phone Number *</label>
-          <input type="number" class="form-control" id="inputphone" name="phone_no" placeholder="+91" required>
+          <input type="tel" class="form-control" pattern="[0-9]{10}" id="inputphone" name="phone_no" title="Please enter a 10-digit phone number" required>
         </div>
         <div class="col-md-5">
           <label for="inputTitle" class="form-label">Book Title *</label>
@@ -27,12 +27,12 @@ procure
         </div>
         <div class="col-md-5">
           <label for="inputPublisher" class="form-label">Publisher's Name *</label>
-          <input type="text" class="form-control" id="inputPublisher" name="book_publisher"  required>
+          <input type="text" class="form-control" id="inputPublisher" name="book_publisher" required>
         </div>
         
         <div class="col-md-5">
           <label for="inputISBN" class="form-label">ISBN</label>
-          <input type="text" class="form-control" id="inputISBN" name="book_isbn">
+          <input type="text" class="form-control" id="inputISBN" name="book_isbn" maxlength="13">
         </div>
         
         <div class="col-12 text-center" style="margin-top:15px">

@@ -125,4 +125,6 @@ class ModelTestCase(TestCase):
         # Check if the vendor list stock is updated accordingly
         vendor_list = Vendor_list.objects.get(book=new_book)
         self.assertEqual(vendor_list.stock, 22)
+
+        print("Models working fine...")
     

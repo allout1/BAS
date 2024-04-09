@@ -13,6 +13,7 @@ import random
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 import datetime
+from django.urls import reverse
 
 #---USER-LOGIN---#
 def login_view(request):
@@ -191,6 +192,11 @@ def add_to_cart(request, book_id):
     except ValueError: # if entered quantity is not a valid integer give error and return to previous page
         messages.error(request, "Invalid quantity.")
         return redirect('/book_details/'+str(book_id))
+
+    if(quantity>book.inventory.stock):
+        messages.error(request, f"Less stock for '{book.title}'")
+        return redirect('/book_details/'+str(book_id))
+    
 
     # if book already present in cart get its instance else create a new instance
     cart, created = Cart.objects.get_or_create(user=request.user,book=book,defaults={'quantity': quantity})

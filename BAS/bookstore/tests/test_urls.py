@@ -117,3 +117,6 @@ class TestUrls(TestCase):
     def test_logout_index_url_is_resolved(self):
         url = reverse('logout_index')
         self.assertEquals(resolve(url).func, views.logout_index)
+
+        print("URLs working fine...")
+
