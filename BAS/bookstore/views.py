@@ -30,7 +30,7 @@ def login_view(request):
                 return redirect('search')  # Redirect to the homepage if 'next' is not specified
         else:
             messages.error(request, 'Email not present ! Please Register')
-            return redirect('register')  # if user not present redirect to registration page
+            #return redirect('register')  # if user not present redirect to registration page
     return render(request, 'registration/login.html')
 
 #---REGISTER-A-NEW-USER---#
@@ -314,22 +314,22 @@ def proceed_to_buy(request):
     if request.method =='POST': # get the name of buyer, email and phone number from the form
 
         if not cart.exists():
-            messages.error(request, "Your cart is empty or Transaction is over...")
+            messages.error(request, "Your cart is empty or Transaction is over")
             return redirect('cart')
 
-        # Check if the confirmation checkbox is checked
-        confirmation_checked = request.POST.get('confirmation_checkbox')
-        if confirmation_checked != 'on':
-            messages.error(request, "Please confirm your purchase by checking the checkbox.")
-            return redirect('cart')
+        # # Check if the confirmation checkbox is checked
+        # confirmation_checked = request.POST.get('confirmation_checkbox')
+        # if confirmation_checked != 'on':
+        #     messages.error(request, "Please confirm your purchase by checking the checkbox.")
+        #     return redirect('cart')
         
-        # Get the entered email
-        buyer_email = request.POST.get('buyer_email')
+        # # Get the entered email
+        # buyer_email = request.POST.get('buyer_email')
 
-        # Ensure the entered email matches the user's email
-        if buyer_email != request.user.email:
-            messages.error(request, "Please enter your registered email address.")
-            return redirect('cart')
+        # # Ensure the entered email matches the user's email
+        # if buyer_email != request.user.email:
+        #     messages.error(request, "Please enter your registered email address.")
+        #     return redirect('cart')
 
         name = request.user.username
         email = request.user.email
@@ -404,16 +404,16 @@ def send_email(request):
 
         email_str="\n"
         for cart_item in cart:
-            email_str+= f"{cart_item.book.title} X {cart_item.quantity} - Rack no: {cart_item.book.inventory.rack_number}\n"
+            email_str+= f"{cart_item.book.title}  - Rack no: {cart_item.book.inventory.rack_number}\n"
 
         # Email sending procedure
         subject = 'Your Wishlist'
-        message = f'Hi {name}, This is your wishlist... You can now move to the racks for collecting your book\n{email_str}\nAfter collecting the books go to the machine and click proceed to buy'
+        message = f"Hi {name}, These are the book details.\n{email_str}\nHope you will like the books.\n\n\nDon't forget to complete your purchase."
         email_from = settings.EMAIL_HOST_USER
         recipient_list = [email]
         send_mail(subject, message, email_from, recipient_list)
 
-        messages.success(request, "Wishlist sent successfully!")
+        messages.success(request, f"Book details sent successfully to {email}!")
     
     return redirect('cart')
 

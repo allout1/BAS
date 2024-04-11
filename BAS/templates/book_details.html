@@ -42,7 +42,7 @@ Books Detail
     <div class="row justify-content-center">
         <div class="col-md-6 text-center">
             <h4>Request for the Book</h4>
-            <p class="text-info">If you want to request more quantities than the available stock, please fill out the required quantity:</p>
+            <p class="text-info">For bulk order or more quantity <br>please enter the quantity below. <br>We'll reach out to you soon!</p>
             <form id="requestForm" method="POST" action="{% url 'request_book' book.id %}">
                 {% csrf_token %}
                 <input type="hidden" name="book_id" value="{{ book.id }}">

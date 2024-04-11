@@ -35,7 +35,7 @@ Cart
                         <td>{{ item.book.price }}</td>
                         <td>{{ item.book.inventory.rack_number}}</td>
                         <td>{{ item.quantity }}</td>
-                        <td>{{ item.revenue }}</td>
+                        <td>₹{{ item.revenue }}</td>
                         <td>
                             <form method="post" action="{% url 'remove_from_cart' item.id %}">
                                 {% csrf_token %}
@@ -49,7 +49,7 @@ Cart
                 <tr>
                     <td colspan="3"></td>
                     <td>Total Amount:</td>
-                    <td>{{ total_price }}</td>
+                    <td> (₹){{ total_price }}</td>
                 </tr>
             </tfoot>
         </table>
@@ -59,20 +59,20 @@ Cart
         <div class="col-md-6 mx-auto mb-4">
 
         <div class="container mb-4">
-            <p style="color:dark-green;">Please confirm to proceed with the purchase:</p>
+            <p style="color:dark-green;">Please click below to proceed with the purchase:</p>
         </div>
 
         {% comment %} form to be filled before proceeding to buy  {% endcomment %}
         <form method="POST" action="{% url 'proceed_to_buy' %}" class="row justify-content-center">
             {% csrf_token %}
-            <div class="form-group">
+            {% comment %} <div class="form-group">
                 <label for="buyer_email">Your Email:</label>
                 <input type="email" class="form-control" id="buyer_email" name="buyer_email">
             </div>
             <div class="form-group form-check">
                 <input type="checkbox" class="form-check-input" id="confirmation_checkbox" name="confirmation_checkbox">
                 <label class="form-check-label" for="confirmation_checkbox">I confirm that I want to proceed with the purchase</label>
-            </div>
+            </div> {% endcomment %}
             <div class="col-md-12 text-center mt-3"> <!-- Adjust the column width and alignment as needed -->
                 <button type="submit" class="btn btn-primary">Proceed to Pay</button>
             </div>
