@@ -1,21 +1,18 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.contrib.auth.models import AbstractUser
-import datetime
+from django.utils import timezone
 
-# class CustomUser(AbstractUser):
-#     # Add any additional fields here
-#     pass
+# MODELS
 
-# Create your models here.
+#---------BOOK-----------#
 class Book(models.Model):
     title= models.CharField(max_length=100)
-    author= models.CharField(max_length=50)
-    publisher= models.CharField(max_length=50)
+    author= models.CharField(max_length=100)
+    publisher= models.CharField(max_length=100)
     price= models.DecimalField(max_digits=8, decimal_places=2)
     isbn= models.CharField(max_length=13,unique=True)
     image= models.ImageField(upload_to='static/images',default='static/images/book.png')
-    genre= models.CharField(max_length=50,default="")
+    genre= models.CharField(max_length=50,default="others")
     desc= models.CharField(max_length=1000,default="")
 
     def __str__(self):
@@ -30,6 +27,7 @@ class Book(models.Model):
         else:
             super().save(*args, **kwargs)  # For existing books, just save normally
 
+#---------INVENTORY-----------#
 class Inventory(models.Model):
     book = models.OneToOneField(Book, on_delete=models.CASCADE)
     stock = models.IntegerField(default=0)
@@ -38,6 +36,7 @@ class Inventory(models.Model):
     def __str__(self):
         return f"{self.book.title} - {self.stock}"
 
+    # whenever inventory changes reflect it in the vendor's list model
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         # Update corresponding Vendor_list stock
@@ -46,19 +45,20 @@ class Inventory(models.Model):
             vendor_list.stock = self.stock
             vendor_list.save()
         except Vendor_list.DoesNotExist:
-            pass  # Handle the case where Vendor_list doesn't exist for this book
+            pass 
 
-
+#---------REQUEST-BOOK-(requests for books with less stock)-----------#
 class RequestBook(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     requested_by = models.CharField(max_length=50)
     email= models.EmailField(default="")
     quantity= models.IntegerField(default=0)
-    date_of_request= models.DateTimeField(default=datetime.datetime.now)
+    date_of_request= models.DateTimeField(default=timezone.now())
 
     def __str__(self):
         return f"{self.book.title}-{self.requested_by}"
 
+#---------PROCURE-BOOK-(requests for procurement of a new book)-----------#
 class ProcureBook(models.Model):
     user_name= models.CharField(max_length=50)
     email= models.EmailField()
@@ -72,6 +72,7 @@ class ProcureBook(models.Model):
     def __str__(self):
         return f"{self.book_title}-{self.user_name}"
 
+#---------CART-(to store the books customer wants to buy)-----------#
 class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
@@ -85,9 +86,9 @@ class Cart(models.Model):
         self.revenue = self.quantity * self.book.price
         self.save()
 
-
+#---------SALES-(contains all the sales done in the shop)-----------#
 class Sales(models.Model):
-    date= models.DateTimeField(default=datetime.datetime.now)
+    date= models.DateTimeField(default=timezone.now())
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     revenue= models.DecimalField(max_digits=10,decimal_places=2)
     quantity=models.IntegerField(default=0)
@@ -96,6 +97,7 @@ class Sales(models.Model):
     def __str__(self):
         return f"{self.date} - {self.book.title}"
 
+#---------VENDOR-(contains the details of all vendors)-----------#
 class Vendor(models.Model):
     name= models.CharField(max_length=100)
     email= models.EmailField()
@@ -105,6 +107,7 @@ class Vendor(models.Model):
     def __str__(self):
         return self.name
 
+#---------VENDOR-LIST(contains the list of all books and there corresponding vendors)-----------#
 class Vendor_list(models.Model):
     book = models.OneToOneField(Book, on_delete=models.CASCADE)
     vendor= models.ForeignKey(Vendor,on_delete=models.CASCADE,null=True)

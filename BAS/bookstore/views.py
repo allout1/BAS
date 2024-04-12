@@ -317,19 +317,19 @@ def proceed_to_buy(request):
             messages.error(request, "Your cart is empty or Transaction is over")
             return redirect('cart')
 
-        # # Check if the confirmation checkbox is checked
-        # confirmation_checked = request.POST.get('confirmation_checkbox')
-        # if confirmation_checked != 'on':
-        #     messages.error(request, "Please confirm your purchase by checking the checkbox.")
-        #     return redirect('cart')
+        # Check if the confirmation checkbox is checked
+        confirmation_checked = request.POST.get('confirmation_checkbox')
+        if confirmation_checked != 'on':
+            messages.error(request, "Please confirm your purchase by checking the checkbox.")
+            return redirect('cart')
         
-        # # Get the entered email
-        # buyer_email = request.POST.get('buyer_email')
+        # Get the entered email
+        buyer_email = request.POST.get('buyer_email')
 
-        # # Ensure the entered email matches the user's email
-        # if buyer_email != request.user.email:
-        #     messages.error(request, "Please enter your registered email address.")
-        #     return redirect('cart')
+        # Ensure the entered email matches the user's email
+        if buyer_email != request.user.email:
+            messages.error(request, "Please enter your registered email address.")
+            return redirect('cart')
 
         name = request.user.username
         email = request.user.email

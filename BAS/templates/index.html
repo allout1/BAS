@@ -9,8 +9,20 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <!-- Add custom CSS -->
     <link rel="stylesheet" href="{% static 'css/styleindex.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&family=Satisfy&display=swap" rel="stylesheet">
 </head>
 <body>
+    <style>
+        .kalam-bold {
+        font-family: "Kalam", cursive;
+        font-weight: 500;
+        font-style: normal;
+        font-size: 60px;
+    }
+    </style>
+
     <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel" data-interval="3000" style="margin: 0;">
         <ol class="carousel-indicators">
             <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
@@ -39,12 +51,12 @@
         <div class="container-fluid" style="position: absolute; top: 10%; background-color: rgba(0, 0, 0, 0.5);">
             <div class="row">
                 <div class="col-12">
-                    <h1 class="display-2 text-center mt-5" style="color:white" >Welcome to Bookstore</h1>
+                    <h6 class="display-2 text-center mt-5 kalam-bold" style="color:white;">
+                    Your Next Page-Turner Awaits:<br> Seamless Shopping, Infinite Stories!</h6>
                     <div class="text-center mb-5">
                         <!-- Add three buttons -->
                         <a href={% url 'search' %} class="btn btn-primary btn-lg mr-3">Customer</a>
-                        <a href='admin' class="btn btn-primary btn-lg mr-3">Manager</a>
-                        <a href='admin' class="btn btn-primary btn-lg">Employee</a>
+                        <a href='admin' class="btn btn-primary btn-lg mr-3">AuthLogin</a>
                     </div>
                 </div>
             </div>

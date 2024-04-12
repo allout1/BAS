@@ -7,6 +7,14 @@ Bookstore
 {% endblock %}
 
 {% block content %}
+<style>
+.card:hover {
+    transform: scale(1.05); /* Increase the size of the card on hover */
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2); /* Add a shadow effect */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+}
+</style>
+
 <div class="container">
     <h1 class="mb-4 text-center satisfy-regular mt-3" style="font-size:40px;">Discover Captivating Reads...</h1>
     <!-- form for searching a book by author or title -->
@@ -106,7 +114,7 @@ Bookstore
             {% endfor %}
         </div>
     {% else %}
-        <p class="container-fluid" style="font-size:20px;">OOPS!!! No books found.</p>
+        <p class="container-fluid text-center" style="font-size:20px;">OOPS!!! No books found.</p>
     {% endif %}
 </div>
 

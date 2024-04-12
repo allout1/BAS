@@ -10,7 +10,7 @@ Books Detail
   <a href="{% url 'search' %}"><i class="fas fa-arrow-left"></i> Back to Search</a>
     <div class="row">
         <div class="col-md-4" style="max-width:280px;">
-            <img src="{{ book.image.url }}" class="img-fluid" alt="{{ book.title }}">
+            <img src="{{ book.image.url }}" class="img-fluid" alt="{{ book.title }}" style="border: 2px solid black;">
         </div>
         <div class="col-md-8">
             <h2 class="text-center">- {{ book.title }}</h2>
@@ -42,7 +42,7 @@ Books Detail
     <div class="row justify-content-center">
         <div class="col-md-6 text-center">
             <h4>Request for the Book</h4>
-            <p class="text-info">For bulk order or more quantity <br>please enter the quantity below. <br>We'll reach out to you soon!</p>
+            <p class="text-info">For bulk order or more quantity, please enter the quantity below. <br>We'll reach out to you soon!</p>
             <form id="requestForm" method="POST" action="{% url 'request_book' book.id %}">
                 {% csrf_token %}
                 <input type="hidden" name="book_id" value="{{ book.id }}">
