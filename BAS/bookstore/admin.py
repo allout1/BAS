@@ -127,6 +127,7 @@ class ThresholdFIlter(admin.SimpleListFilter):
 
             # Filter books below threshold
             books_below_threshold = Vendor_list.objects.filter(book__inventory__stock__lt=F('threshold'))
+            
 
             return books_below_threshold
 
@@ -134,6 +135,7 @@ class ThresholdFIlter(admin.SimpleListFilter):
 class RequestBookAdmin(admin.ModelAdmin):
     list_display = ('book', 'vendor','threshold','stock')
     list_filter= [ThresholdFIlter]
+    change_list_template='admin/added_button.html'
 
 @admin.register(Vendor)
 class RequestBookAdmin(admin.ModelAdmin):
