@@ -1,0 +1,15 @@
+{% extends "admin/change_list.html" %}
+
+{% block result_list %}
+    {{ block.super }}
+    <tfoot>
+        <tr>
+            <td colspan="{{ cl.num_displayed_columns }}" style="text-align:right; ">
+                <form id="Threshold_form" method="POST" action="{% url 'send_email' %}">
+                    {% csrf_token %}
+                    <button type="submit" style="float:right;margin-top:8px;background-color: #008CBA;font-size: 15px;padding:5px;font-family:arial;color:white;border-radius:3px;border:none;cursor: pointer;" class="btn btn-primary">Get Email</button>
+                </form>
+            </td>
+        </tr>
+    </tfoot>
+{% endblock %}
