@@ -1,15 +1,19 @@
 from django.contrib import admin
-from bookstore.models import Book,RequestBook,ProcureBook,Cart,Inventory,Sales, Vendor, Vendor_list
-from datetime import datetime,timedelta
-from rangefilter.filters import DateRangeFilter
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.db.models import Sum, F 
+from django.core.mail import send_mail
+from django.conf import settings
+
+from bookstore.models import Book,RequestBook,ProcureBook,Cart,Inventory,Sales, Vendor, Vendor_list
+from datetime import datetime,timedelta
+from rangefilter.filters import DateRangeFilter
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 import io
 import base64
 
-admin.site.register(Cart)
+# admin.site.register(Cart)
 
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
@@ -66,13 +70,17 @@ class SalesAdmin(admin.ModelAdmin):
             else:
                 date_revenues[date_local] = sale.revenue
 
-        dates = list(date_revenues.keys())
-        revenues = list(date_revenues.values())
+        
+        dates = sorted(date_revenues.keys())
+        revenues = [date_revenues[date] for date in dates]
 
         bar_width = 0.1 
 
         plt.figure(figsize=(6, 4))  # Adjust the figure size as needed
         plt.bar(dates, revenues, color='blue',width=bar_width)  # Create a bar plot
+        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+        plt.gca().xaxis.set_major_locator(mdates.DayLocator(interval=1))  # Set tick interval to 1 day
+
         plt.title('TOTAL REVENUE v/s DATE')
         plt.xlabel('DATE')
         plt.ylabel('TOTAL REVENUE (in ₹)')
@@ -132,12 +140,40 @@ class ThresholdFIlter(admin.SimpleListFilter):
             return books_below_threshold
 
 @admin.register(Vendor_list)
-class RequestBookAdmin(admin.ModelAdmin):
+class VendorListAdmin(admin.ModelAdmin):
     list_display = ('book', 'vendor','threshold','stock')
     list_filter= [ThresholdFIlter]
     change_list_template='admin/added_button.html'
+    actions=['send_orders_to_vendors']
+
+    def send_orders_to_vendors(self, request, queryset):
+        print("*")
+        # Collect all vendors and their respective books below threshold
+        vendor_books = {}
+        for vendor_list in queryset:
+            if vendor_list.stock < vendor_list.threshold:
+                if vendor_list.vendor.id not in vendor_books:
+                    vendor_books[vendor_list.vendor.id] = []
+                vendor_books[vendor_list.vendor.id].append(vendor_list)
+
+        # Send orders to vendors
+        for vendor_id, books in vendor_books.items():
+            vendor = Vendor.objects.get(id=vendor_id)
+            order_message = "Please supply the following books:\n\n"
+            for book in books:
+                order_message += f"- {book.book.title} ({book.threshold - book.stock} copies)\n"
+
+            # Send the order message to the vendor via email
+            send_mail(
+                subject="Order Request",
+                message=order_message,
+                from_email=settings.EMAIL_HOST_USER,
+                recipient_list=[vendor.email],
+            )
+
+        self.message_user(request, _("Orders sent to vendors successfully."))
 
 @admin.register(Vendor)
-class RequestBookAdmin(admin.ModelAdmin):
+class VendorAdmin(admin.ModelAdmin):
     list_display = ('name', 'address')
     

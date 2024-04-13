@@ -1,7 +1,11 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
 
+# overide the authentication method...
 class EmailOrUsernameAuthenticationBackend(ModelBackend):
+
+    # authenticate user by email/username 
+    # if super user then also verify the password
     def authenticate(self, request, username=None, password=None, email=None, **kwargs):
         User = get_user_model()
         if username is None:
@@ -25,6 +29,7 @@ class EmailOrUsernameAuthenticationBackend(ModelBackend):
 
         return user
 
+    #get user by user id
     def get_user(self, user_id):
         User = get_user_model()
         try:

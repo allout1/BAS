@@ -13,7 +13,7 @@ Login
                 {% csrf_token %}
                 <div class="form-group">
                     <label for="email">Email:</label>
-                    <input type="text" class="form-control" id="email" name="email" required>
+                    <input type="text" class="form-control" id="email" name="email" autocomplete="off" required>
                 </div>
                 {% comment %} <div class="form-group">
                     <label for="password">Password:</label>

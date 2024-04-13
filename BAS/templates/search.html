@@ -13,10 +13,16 @@ Bookstore
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.2); /* Add a shadow effect */
     transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
 }
+
+.input-group:hover {
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
+}
+
 </style>
 
 <div class="container">
-    <h1 class="mb-4 text-center satisfy-regular mt-3" style="font-size:40px;">Discover Captivating Reads...</h1>
+    <h1 class="mb-4 text-center satisfy-regular mt-3 my-text" style="font-size:45px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);">Discover Captivating Reads...</h1>
     <!-- form for searching a book by author or title -->
     <div class="text-center">
     <form method="GET" action="{% url 'search' %}" style="max-width:60%; margin-left:20%;">
@@ -35,7 +41,7 @@ Bookstore
 
     {% if normal == 1 %}
         {% for genre in genres %}
-        <div class="container mx-0 text-center">
+        <div class="container mx-0 text-center carousal-row">
             <h3 style="text-transform: capitalize;">{{ genre }}</h3>
             <div id="slider_{{ forloop.counter }}" class="carousel slide px-5" data-ride="carousel">
                 <div class="carousel-inner">

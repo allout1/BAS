@@ -31,10 +31,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    # "semantic_admin",
-    # "semantic_forms",
     'bookstore.apps.BookstoreConfig',
-    # 'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

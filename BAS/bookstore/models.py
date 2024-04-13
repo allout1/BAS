@@ -22,7 +22,7 @@ class Book(models.Model):
         if not self.pk:  # Check if this is a new book instance
             super().save(*args, **kwargs)  # Save the book instance
             # Create corresponding Inventory instance with zero stock
-            Inventory.objects.create(book=self, stock=0)
+            Inventory.objects.create(book=self)
             Vendor_list.objects.create(book=self)
         else:
             super().save(*args, **kwargs)  # For existing books, just save normally
@@ -45,7 +45,7 @@ class Inventory(models.Model):
             vendor_list.stock = self.stock
             vendor_list.save()
         except Vendor_list.DoesNotExist:
-            pass 
+            pass
 
 #---------REQUEST-BOOK-(requests for books with less stock)-----------#
 class RequestBook(models.Model):
@@ -96,6 +96,14 @@ class Sales(models.Model):
 
     def __str__(self):
         return f"{self.date} - {self.book.title}"
+
+    def delete(self, *args, **kwargs):
+        # Update inventory before deleting the sale
+        inventory = Inventory.objects.get(book=self.book)
+        inventory.stock += self.quantity  # Increase stock by the quantity of the sale being deleted
+        inventory.save()
+
+        super().delete(*args, **kwargs)
 
 #---------VENDOR-(contains the details of all vendors)-----------#
 class Vendor(models.Model):

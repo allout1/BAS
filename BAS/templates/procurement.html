@@ -11,7 +11,7 @@ procure
     {% csrf_token %}
         <div class="col-md-5">
           <label for="inputphone" class="form-label">Phone Number *</label>
-          <input type="tel" class="form-control" pattern="[0-9]{10}" id="inputphone" name="phone_no" title="Please enter a 10-digit phone number" required>
+          <input type="tel" class="form-control" pattern="[0-9]{10}" id="inputphone" name="phone_no" title="Please enter a 10-digit phone number" autocomplete="off" required>
         </div>
         <div class="col-md-5">
           <label for="inputTitle" class="form-label">Book Title *</label>
