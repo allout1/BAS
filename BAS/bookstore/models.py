@@ -11,7 +11,7 @@ class Book(models.Model):
     publisher= models.CharField(max_length=100)
     price= models.DecimalField(max_digits=8, decimal_places=2)
     isbn= models.CharField(max_length=13,unique=True)
-    image= models.ImageField(upload_to='static/images',default='static/images/book.png')
+    image= models.ImageField(upload_to='static/images',default='static/images/book.jpg')
     genre= models.CharField(max_length=50,default="others")
     desc= models.CharField(max_length=1000,default="")
 
