@@ -147,7 +147,6 @@ class VendorListAdmin(admin.ModelAdmin):
     actions=['send_orders_to_vendors']
 
     def send_orders_to_vendors(self, request, queryset):
-        print("*")
         # Collect all vendors and their respective books below threshold
         vendor_books = {}
         for vendor_list in queryset:
