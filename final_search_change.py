@@ -116,9 +116,21 @@ def search(request):
     return render(request, 'search.html', {'books': books, 'request': request, 'genres':genres, 'all_books':shuffled_books,'normal':normal})
 
 #---SEARCH-TITLE---#
+#---SEARCH-TITLE---#
 def search_books(request):
     request.session['previous_url'] = request.build_absolute_uri()
     query = cleaner(str(request.GET.get('query'))) # get query from the form)
+    query2 = query.split(' ')
+    query3 = str()
+    count = 0
+    for i in query2:
+        if len(i) != 1:
+            query3 += (str(i) + ".*")
+            count = 1
+        else:
+            query3 += (str(i) + ".*")
+    if count == 1:
+        query = query3
     query = query.replace(' ','')
     query = query.lower()
     if query: # search for the book either by author name or title in the books table of db
@@ -132,6 +144,9 @@ def search_books(request):
         if(query[i]=='['):
             y += query[i] + query[i+1] + query[i+2]
             i = i + 3
+        elif (query[i] == "."):
+            y += (query[i] + query[i+1])
+            i = i + 2
         else:
             y += (query[i]+  "[.*,-:()' ]*")
             i= i + 1
@@ -153,12 +168,17 @@ def search_authors(request):
     query = query.replace('.',' ')
     query2 = query.split(' ')
     query3 = str()
+    count = 0
     for i in query2:
         if len(i) != 1:
             query3 += str(i)
+            count = 1
         else:
             query3 += (str(i) + ".*")
-    query = query3
+    if count == 1:
+        query = query3
+    else:
+        query = query
     query = query.replace(' ','')
     query = query.lower()
     if query: # search for the book either by author name or title in the books table of db
