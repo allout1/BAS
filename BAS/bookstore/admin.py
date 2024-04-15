@@ -143,7 +143,7 @@ class ThresholdFIlter(admin.SimpleListFilter):
 class VendorListAdmin(admin.ModelAdmin):
     list_display = ('book', 'vendor','threshold','stock')
     list_filter= [ThresholdFIlter]
-    change_list_template='admin/added_button.html'
+    # change_list_template='admin/added_button.html'
     actions=['send_orders_to_vendors']
 
     def send_orders_to_vendors(self, request, queryset):
