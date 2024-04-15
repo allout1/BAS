@@ -121,7 +121,7 @@ def search_books(request):
     request.session['previous_url'] = request.build_absolute_uri()
     query = cleaner(str(request.GET.get('query'))) # get query from the form)
     query2 = query.split(' ')
-    query3 = str()
+    query3 =  '^'
     count = 0
     for i in query2:
         if len(i) != 1:
