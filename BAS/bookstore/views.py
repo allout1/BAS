@@ -59,6 +59,7 @@ def logout_view(request):
   response = redirect('home') # redirect to the index.html page
   return response
 
+
 #---SEARCH-BOOKS---#
 def cleaner(query):
     metacharacters = [
@@ -81,7 +82,12 @@ def cleaner(query):
     query1 = ""
     for i in query:
         if i in metacharacters:
-            query1 += '['+i+']'
+            if i == "\\":
+                query1+="\\\\"
+            elif i == '^':
+                query1+= '\^'
+            else:
+                query1 += '['+i+']'
         else:
             query1 += i
     return query1
@@ -114,6 +120,17 @@ def search(request):
 def search_books(request):
     request.session['previous_url'] = request.build_absolute_uri()
     query = cleaner(str(request.GET.get('query'))) # get query from the form)
+    query2 = query.split(' ')
+    query3 = str()
+    count = 0
+    for i in query2:
+        if len(i) != 1:
+            query3 += (str(i) + ".*")
+            count = 1
+        else:
+            query3 += (str(i) + ".*")
+    if count == 1:
+        query = query3
     query = query.replace(' ','')
     query = query.lower()
     if query: # search for the book either by author name or title in the books table of db
@@ -127,6 +144,9 @@ def search_books(request):
         if(query[i]=='['):
             y += query[i] + query[i+1] + query[i+2]
             i = i + 3
+        elif (query[i] == "."):
+            y += (query[i] + query[i+1])
+            i = i + 2
         else:
             y += (query[i]+  "[.*,-:()' ]*")
             i= i + 1
@@ -145,15 +165,31 @@ def search_books(request):
 #---SEARCH-AUTHORS---#
 def search_authors(request):
     query = cleaner(str(request.GET.get('query'))) # get query from the form
-    query1 = query[::-1]
-    if(query1.find('.') != -1):
-        query1= query1[0:query1.find('.')]
-        query1 = query1[::-1]
-        if(len(query1) > 1):
-            query = query1
     query = query.replace('.',' ')
+    query2 = query.split(' ')
+    count = 0
+    j = 0
+    for i in query2:
+        if len(i) == 1:
+            j = 2
+            break
+    if j == 2:
+        query3 = "^"
+    else:
+        query3 = str()
+    for i in query2:
+        if len(i) != 1:
+            query3 += str(i)
+            count = 1
+        else:
+            query3 += (str(i) + ".*")
+    if count == 1:
+        query =  query3
+    else:
+        query = query
     query = query.replace(' ','')
     query = query.lower()
+    print(query)
     if query: # search for the book either by author name or title in the books table of db
         books = {str(book[0]) for book in Book.objects.values_list('author')}
     else:
@@ -165,8 +201,11 @@ def search_authors(request):
         if(query[i]=='['):
             y += query[i] + query[i+1] + query[i+2]
             i = i + 3
+        elif (query[i] == "."):
+            y += (query[i] + query[i+1])
+            i = i + 2
         else:
-            y += (query[i]+  "[.*,-:()' ]*")
+            y += (query[i]+  "[\.\*,-:()' ]*")
             i= i + 1
     for i in books:
         if(re.search(y,i.lower())):
@@ -337,7 +376,7 @@ def proceed_to_buy(request):
             inventory = Inventory.objects.get(book=book)
             # Handle insufficient stock situation
             if inventory.stock < cart_item.quantity:
-                messages.error(request,f"Insufficient stock for {book.title} . Please try again.")
+                messages.error(request,f"Insufficient stock for {book.title} . Reduce your quantity.")
                 return redirect('cart')
 
         for cart_item in cart:
