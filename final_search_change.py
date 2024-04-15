@@ -150,18 +150,14 @@ def search_books(request):
 #---SEARCH-AUTHORS---#
 def search_authors(request):
     query = cleaner(str(request.GET.get('query'))) # get query from the form
-    query1 = query[::-1]
-    if(query1.find('.') != -1):
-        query1= query1[0:query1.find('.')]
-        query1 = query1[::-1]
-        if(len(query1) > 1):
-            query = query1
     query = query.replace('.',' ')
     query2 = query.split(' ')
     query3 = str()
     for i in query2:
         if len(i) != 1:
             query3 += str(i)
+        else:
+            query3 += (str(i) + ".*")
     query = query3
     query = query.replace(' ','')
     query = query.lower()
@@ -176,6 +172,9 @@ def search_authors(request):
         if(query[i]=='['):
             y += query[i] + query[i+1] + query[i+2]
             i = i + 3
+        elif (query[i] == "."):
+            y += (query[i] + query[i+1])
+            i = i + 2
         else:
             y += (query[i]+  "[.*,-:()' ]*")
             i= i + 1
