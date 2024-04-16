@@ -7,6 +7,39 @@ Bookstore
 {% endblock %}
 
 {% block content %}
+
+{% if modal_value %}
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Instructions: </h5>
+                </div>
+                <div class="modal-body">
+                    <ol>
+                    <li> Click on Start Shopping. </li>
+                    <li> Login/Register </li>
+                    <li> Search your books </li>
+                    <li> Add to cart </li>
+                    <li> Checkout </li>
+                    <li> Collect your books </li>
+                    </ol>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script >
+    // Use jQuery ready function to trigger the modal when the page loads
+    $(document).ready(function() {
+    $('#exampleModal').modal('show');
+    }); 
+</script>
+
+
 <style>
 .card:hover {
     transform: scale(1.05); /* Increase the size of the card on hover */
@@ -18,6 +51,8 @@ Bookstore
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
     transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition */
 }
+
+{% endif %}
 
 </style>
 

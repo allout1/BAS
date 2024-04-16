@@ -12,6 +12,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&family=Satisfy&display=swap" rel="stylesheet">
+    
 </head>
 <body>
     <style>
@@ -28,20 +29,16 @@
             <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
             <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
             <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
-            <li data-target="#carouselExampleIndicators" data-slide-to="3"></li>
         </ol>
         <div class="carousel-inner" style="height: 100vh;">
             <div class="carousel-item active" style="height: 100%;">
-                <img src="{% static 'images/bookshop7.jpg' %}" class="d-block w-100" alt="..." style="height: 100%; object-fit: cover;">
+                <img src="{% static 'images/final_bg_1.jpg' %}" class="d-block w-100" alt="..." style="height: 100%; object-fit: cover;">
             </div>
             <div class="carousel-item" style="height: 100%;">
-                <img src="{% static 'images/bookshop8.jpg' %}" class="d-block w-100" alt="..." style="height: 100%; object-fit: cover;">
+                <img src="{% static 'images/final_bg_3.jpg' %}" class="d-block w-100" alt="..." style="height: 100%; object-fit: cover;">
             </div>
             <div class="carousel-item" style="height: 100%;">
-                <img src="{% static 'images/bookshop9.jpg' %}" class="d-block w-100" alt="..." style="height: 100%; object-fit: cover;">
-            </div>
-            <div class="carousel-item" style="height: 100%;">
-                <img src="{% static 'images/bg_4.jpg' %}" class="d-block w-100" alt="..." style="height: 100%; object-fit: cover;">
+                <img src="{% static 'images/final_bg_2.jpg' %}" class="d-block w-100" alt="..." style="height: 100%; object-fit: cover;">
             </div>
             
         </div>
@@ -60,7 +57,7 @@
                     Your Next Page-Turner Awaits: Seamless Shopping, Infinite Stories!</h6>
                     <div class="text-center mb-5">
                         <!-- Add three buttons -->
-                        <a href={% url 'search' %} class="btn btn-primary btn-lg mr-3">Customer</a>
+                        <a href={% url 'customer_to_search' %} class="btn btn-primary btn-lg mr-3">Customer</a>
                         <a href='admin' class="btn btn-primary btn-lg mr-3">AuthLogin</a>
                     </div>
                 </div>

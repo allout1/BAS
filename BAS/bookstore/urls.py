@@ -12,6 +12,8 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     # search page
     path('search/',views.search, name='search'),
+    # search page on clicking the customer button from index page.
+    path('customer_to_search/',views.customer_to_search,name='customer_to_search'),
     # add a book to cart
     path("add_to_cart/<int:book_id>/", views.add_to_cart, name="add_to_cart"),
     # cart page

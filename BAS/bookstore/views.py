@@ -94,6 +94,7 @@ def cleaner(query):
 
 #---SEARCH-BOOKS---#
 def search(request):
+    request.session['previous_url'] = request.build_absolute_uri()
     query = request.GET.get('query') # get query from the form
     search_type = request.GET.get('search_type') # get the query type i.e. by author or title
 
@@ -101,6 +102,7 @@ def search(request):
     shuffled_books = random.sample(list(all_books), len(all_books))
     
     genres=['fiction','spiritual','self-help','JEE','children']
+    modal_value=0
 
     if query and search_type: # search for the book either by author name or title in the books table of db
         if search_type == 'author':
@@ -114,11 +116,23 @@ def search(request):
         books = []
         normal=1 # normal is the parameter which decides whether normal page is to be shown or searched results
     # render the page search.html  with the list of searched book
-    return render(request, 'search.html', {'books': books, 'request': request, 'genres':genres, 'all_books':shuffled_books,'normal':normal})
+    return render(request, 'search.html', {'books': books, 'request': request, 'genres':genres, 'all_books':shuffled_books,'normal':normal, 'modal_value':modal_value})
+
+def customer_to_search(request):
+    all_books = Book.objects.all()
+    shuffled_books = random.sample(list(all_books), len(all_books))
+    
+    genres=['fiction','spiritual','self-help','JEE','children']
+
+    normal=1
+    modal_value=1
+    books = []
+
+    return render(request, 'search.html', {'books': books, 'request': request, 'genres':genres, 'all_books':shuffled_books,'normal':normal, 'modal_value':modal_value})
 
 #---SEARCH-TITLE---#
 def search_books(request):
-    request.session['previous_url'] = request.build_absolute_uri()
+    
     query = cleaner(str(request.GET.get('query'))) # get query from the form)
     query2 = query.split(' ')
     query3 = str()
