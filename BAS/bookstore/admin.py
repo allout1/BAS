@@ -143,6 +143,7 @@ class ThresholdFIlter(admin.SimpleListFilter):
 class VendorListAdmin(admin.ModelAdmin):
     list_display = ('book', 'vendor','threshold','stock')
     list_filter= [ThresholdFIlter]
+    ordering=('vendor',)
     # change_list_template='admin/added_button.html'
     actions=['send_orders_to_vendors']
 
